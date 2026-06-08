@@ -48,3 +48,4 @@ Copia el `whsec_...` generado por CLI a `STRIPE_WEBHOOK_SECRET`.
 ## Nota legal importante
 
 Las páginas legales incluidas son base técnica y no sustituyen asesoría jurídica. Ajusta términos, privacidad, impuestos, devoluciones y cumplimiento (por ejemplo, estado/país) con un abogado antes de operar comercialmente.
+
