@@ -2,6 +2,7 @@ const USER_KEY = "curvysweetUser";
 const CARDS_KEY = "curvysweetPaymentMethods";
 const ORDERS_KEY = "curvysweetOrders";
 const PREFERENCES_KEY = "curvysweetPreferences";
+let currentUser = null;
 
 function readJson(key, fallback) {
   try {
@@ -13,6 +14,20 @@ function readJson(key, fallback) {
 
 function writeJson(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
+}
+
+function userKey(key) {
+  const identity = String(currentUser?.mail || currentUser?.username || "guest").trim().toLowerCase();
+  return `${key}:${identity}`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function setStatus(message) {
@@ -47,7 +62,7 @@ function activateTab(tabName) {
 }
 
 function renderCards() {
-  const cards = readJson(CARDS_KEY, []);
+  const cards = readJson(userKey(CARDS_KEY), []);
   const list = document.querySelector("[data-payment-list]");
   const count = document.querySelector("[data-card-count]");
 
@@ -63,8 +78,8 @@ function renderCards() {
     .map(
       (card) => `
         <article class="payment-card">
-          <div><span>${card.brand}</span><strong>•••• ${card.last4}</strong><small>${card.label}</small></div>
-          <button type="button" data-remove-card="${card.id}" aria-label="Quitar ${card.label}">Quitar</button>
+          <div><span>${escapeHtml(card.brand)}</span><strong>•••• ${escapeHtml(card.last4)}</strong><small>${escapeHtml(card.label)}</small></div>
+          <button type="button" data-remove-card="${escapeHtml(card.id)}" aria-label="Quitar ${escapeHtml(card.label)}">Quitar</button>
         </article>
       `,
     )
@@ -72,7 +87,7 @@ function renderCards() {
 }
 
 function renderOrders() {
-  const orders = readJson(ORDERS_KEY, []);
+  const orders = readJson(userKey(ORDERS_KEY), []);
   const list = document.querySelector("[data-order-list]");
   if (!list) return;
 
@@ -92,8 +107,8 @@ function renderOrders() {
     .map(
       (order) => `
         <article class="order-card">
-          <div><span>Pedido ${order.id}</span><strong>${order.total || "Compra confirmada"}</strong></div>
-          <div><span>${order.date || ""}</span><strong class="order-status">${order.status || "Confirmado"}</strong></div>
+          <div><span>Pedido ${escapeHtml(order.id)}</span><strong>${escapeHtml(order.total || "Compra confirmada")}</strong></div>
+          <div><span>${escapeHtml(order.date || "")}</span><strong class="order-status">${escapeHtml(order.status || "Confirmado")}</strong></div>
         </article>
       `,
     )
@@ -108,9 +123,11 @@ function init() {
     return;
   }
 
+  currentUser = user;
+
   const profileForm = document.querySelector("[data-profile-form]");
   const preferencesForm = document.querySelector("[data-preferences-form]");
-  const preferences = readJson(PREFERENCES_KEY, {});
+  const preferences = readJson(userKey(PREFERENCES_KEY), {});
 
   document.querySelector("[data-account-name]").textContent = user.name || user.username || "Mi cuenta";
   document.querySelector("[data-account-mail]").textContent = user.mail || "";
@@ -167,14 +184,14 @@ function init() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    const cards = readJson(CARDS_KEY, []);
+    const cards = readJson(userKey(CARDS_KEY), []);
     cards.push({
       id: crypto.randomUUID?.() || String(Date.now()),
       label: String(data.get("label") || ""),
       brand: String(data.get("brand") || ""),
       last4: String(data.get("last4") || ""),
     });
-    writeJson(CARDS_KEY, cards);
+    writeJson(userKey(CARDS_KEY), cards);
     form.reset();
     renderCards();
     setStatus("Tarjeta añadida.");
@@ -183,14 +200,14 @@ function init() {
   document.querySelector("[data-payment-list]")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-remove-card]");
     if (!button) return;
-    writeJson(CARDS_KEY, readJson(CARDS_KEY, []).filter((card) => card.id !== button.dataset.removeCard));
+    writeJson(userKey(CARDS_KEY), readJson(userKey(CARDS_KEY), []).filter((card) => card.id !== button.dataset.removeCard));
     renderCards();
     setStatus("Tarjeta eliminada.");
   });
 
   preferencesForm?.addEventListener("submit", (event) => {
     event.preventDefault();
-    writeJson(PREFERENCES_KEY, {
+    writeJson(userKey(PREFERENCES_KEY), {
       marketing: preferencesForm.elements.marketing.checked,
       stockAlerts: preferencesForm.elements.stockAlerts.checked,
       cartReminders: preferencesForm.elements.cartReminders.checked,

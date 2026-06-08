@@ -1,0 +1,1 @@
+import{i as n}from"./bar-menu-scroll.BQxKzzCK.js";import{i as o}from"./theme-toggle.BzpejnpD.js";async function e(){const t=document.getElementById("visits-value");if(t)try{const i=await fetch("/api/visits");if(!i.ok)throw new Error("No se pudo consultar visitas.");const s=await i.json();t.textContent=String(s?.visits??0)}catch{t.textContent="0"}}n();o();e();

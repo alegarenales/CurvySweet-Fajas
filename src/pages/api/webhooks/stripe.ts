@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const payload = await request.text();
-  const stripe = new Stripe(stripeSecretKey);
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: '2026-05-27.dahlia' });
 
   let event: Stripe.Event;
   try {

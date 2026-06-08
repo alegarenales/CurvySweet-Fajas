@@ -109,7 +109,7 @@ export const products: Product[] = [
       "/products/faja short moldeadora/faja_short_moldeadora_5.jpg",
       "/products/faja short moldeadora/faja_short_moldeadora_6.jpg",
     ],
-    stripePriceId: import.meta.env.STRIPE_PRICE_FAJA_MOLDEADORA ?? "",
+    stripePriceId: import.meta.env.STRIPE_PRICE_FAJA_MOLDEADORA ?? import.meta.env.STRIPE_PRICE_FAJA_MOLDEADORA_REDUCTORA ?? import.meta.env.STRIPE_PRICE_FAJA_SHORT_MOLEDEADORA ?? "",
     tag: "Oferta",
     inStock: true,
     link: "/producto/faja_moldeadora"

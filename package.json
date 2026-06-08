@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
-    "@astrojs/node": "^9.5.4",
+    "@astrojs/vercel": "^9.0.5",
     "astro": "^5.17.1",
     "mssql": "^12.5.0",
     "nodemailer": "^8.0.7",

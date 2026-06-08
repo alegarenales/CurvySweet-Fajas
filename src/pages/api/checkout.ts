@@ -31,35 +31,56 @@ export const POST: APIRoute = async ({ request }) => {
     ? body.items
     : [{ productId: body.productId, quantity: 1 }];
 
+  const DEV_TEST_PRICE = import.meta.env.STRIPE_TEST_PRICE_ID ?? "";
+
   const lineItems = requestedItems.map((item) => {
     const productId = item.productId?.trim();
     const quantity = Math.max(1, Math.min(Number(item.quantity) || 1, 20));
     const product = productId ? getProductById(productId) : undefined;
 
-    if (!product || !product.stripePriceId || !product.inStock) {
+    if (!product || !product.inStock) {
+      return undefined;
+    }
+
+    // Usa el priceId definido en el producto; en modo desarrollo, permite un
+    // `STRIPE_TEST_PRICE_ID` global como fallback para pruebas locales.
+    const priceId = product.stripePriceId || ((import.meta.env.MODE === 'development' && DEV_TEST_PRICE) ? DEV_TEST_PRICE : "");
+
+    if (!priceId) {
       return undefined;
     }
 
     return {
-      price: product.stripePriceId,
+      price: priceId,
       quantity,
       productId: product.id,
     };
   });
 
   if (lineItems.some((item) => !item) || !lineItems.length) {
+    const invalid = requestedItems
+      .filter((it) => {
+        const pid = it.productId?.trim();
+        const p = pid ? getProductById(pid) : undefined;
+        const hasPriceOrDevFallback = p && (p.stripePriceId || (import.meta.env.MODE === 'development' && DEV_TEST_PRICE));
+        return !p || !p.inStock || !hasPriceOrDevFallback;
+      })
+      .map((it) => it.productId || "(sin id)");
+
     return jsonResponse(400, {
       error: "Hay productos invalidos, sin stock o no configurados para pagos.",
+      invalidProducts: invalid.join(","),
     });
   }
 
-  const stripe = new Stripe(stripeSecretKey);
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: '2026-05-27.dahlia' });
   const successUrl = new URL("/success?session_id={CHECKOUT_SESSION_ID}", request.url).toString();
   const cancelUrl = new URL("/cancel", request.url).toString();
 
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
+      payment_method_types: ["card"],
       line_items: lineItems.map((item) => ({
         price: item!.price,
         quantity: item!.quantity,
@@ -79,7 +100,11 @@ export const POST: APIRoute = async ({ request }) => {
 
     return jsonResponse(200, { url: session.url });
   } catch (error) {
+    const stripeError = error instanceof Error ? error.message : "Error desconocido de Stripe.";
     console.error("Error creando Checkout Session:", error);
-    return jsonResponse(500, { error: "No se pudo iniciar el checkout." });
+    return jsonResponse(500, {
+      error: `No se pudo iniciar el checkout. ${stripeError}`,
+      stripeError,
+    });
   }
 };

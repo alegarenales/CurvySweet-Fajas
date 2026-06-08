@@ -189,7 +189,10 @@ const checkout = async () => {
 		const payload = await response.json();
 
 		if (!response.ok || !payload.url) {
-			throw new Error(payload.error || 'No se pudo iniciar el pago.');
+			const message = payload.stripeError
+				? `${payload.error} ${payload.stripeError}`
+				: payload.error || 'No se pudo iniciar el pago.';
+			throw new Error(message);
 		}
 
 		window.location.href = payload.url;
