@@ -8,7 +8,7 @@ const config: sql.config = {
   database: import.meta.env.DB_NAME,
   options: {
     encrypt: true,
-    trustServerCertificate: true,
+    trustServerCertificate: false,
   },
 };
 
