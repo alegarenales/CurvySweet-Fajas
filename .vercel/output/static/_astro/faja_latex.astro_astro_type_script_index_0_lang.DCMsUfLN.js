@@ -1,1 +1,0 @@
-import{i as a}from"./theme-toggle.BzpejnpD.js";a();document.querySelectorAll("[data-option-group]").forEach(r=>{const t=r.querySelectorAll("[data-option-button]");t.forEach(e=>{e.addEventListener("click",()=>{t.forEach(s=>{s.classList.remove("is-selected"),s.setAttribute("aria-pressed","false")}),e.classList.add("is-selected"),e.setAttribute("aria-pressed","true")})})});

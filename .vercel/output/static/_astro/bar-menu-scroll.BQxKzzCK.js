@@ -1,1 +1,0 @@
-function o(){const e=document.getElementById("bar-menu");if(!e)return;const n=()=>{e.classList.toggle("scrolled",window.scrollY>20)};window.addEventListener("scroll",n,{passive:!0}),n()}export{o as i};
