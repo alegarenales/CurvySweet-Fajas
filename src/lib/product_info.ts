@@ -352,7 +352,7 @@ const productContentMap: Record<string, ProductContent> = {
 			},
 		],
 		relatedProductIds: ['faja_control_abdominal', 'faja_latex'],
-	},
+	git pull origen main	},
 };
 
 function mergeGallery(product: CatalogProduct, gallery: string[]) {
