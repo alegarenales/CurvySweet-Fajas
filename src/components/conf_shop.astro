@@ -1,0 +1,219 @@
+---
+import astroLogo from '../assets/astro.svg';
+import background from '../assets/background.svg';
+import UserMenu from './UserMenu.astro';
+import CartDrawer from './CartDrawer.astro';
+import { getProducts } from '../lib/catalog';
+import './CSS/Shop.css';
+const products = getProducts();
+---
+<div id="bar-menu">
+    <nav>
+        <a id="logo" href=".">CurvySweet</a>
+        <div class="nav">
+            <a href=".">Home</a>
+            <a href="/shop">Tienda</a>
+            <a href="/login" data-guest-link>Iniciar Sesion</a>
+            <a href="/register" data-guest-link>Registrarse</a>
+            <button class="cart-nav-button" type="button" data-cart-open aria-label="Abrir carrito">
+                <span class="cart-nav-icon" aria-hidden="true">Cart</span>
+                <span class="cart-nav-count" data-cart-count>0</span>
+            </button>
+			<UserMenu />
+            <button id="theme-toggle" type="button">Modo oscuro</button>
+        </div>
+    </nav>
+
+</div>
+<section class="shop-section" id="shop">
+	<div class="shop-header">
+		<p class="shop-kicker">CurvySweet</p>
+		<h2>Tienda</h2>
+		<p class="shop-subtitle">Descubre nuestras piezas mas vendidas para realzar tu figura.</p>
+	</div>
+
+	<div class="shop-grid">
+		{
+			products.map((product) => (
+				<article
+					class="product-card"
+					role={product.link ? 'link' : undefined}
+					tabindex={product.link ? '0' : undefined}
+					data-product-link={product.link ?? ''}
+					onclick="handleProductCardClick(event)"
+					onkeydown="handleProductCardKeydown(event)"
+					style={product.link ? 'cursor: pointer;' : ''}
+				>
+					<div class="product-card-top">
+						<span class="product-tag">{product.tag}</span>
+						<span
+							class={`stock-indicator ${product.inStock ? 'is-in-stock' : 'is-out-of-stock'}`}
+							data-product-stock={product.id}
+							aria-label={product.inStock ? 'Producto en stock' : 'Producto sin stock'}
+							title={product.inStock ? 'Producto en stock' : 'Producto sin stock'}
+						>
+							<span class="stock-dot" aria-hidden="true"></span>
+							<span class="stock-text" data-stock-text>
+								{product.inStock ? 'En stock' : 'Sin stock'}
+							</span>
+						</span>
+					</div>
+					<div
+						class="product-image"
+						role="img"
+						aria-label={product.name}
+						data-product-images={product.images?.join('|') ?? (product.image ?? '')}
+					>
+						<div
+							class="product-image-layer is-active"
+							data-image-primary
+							data-product-image={product.id}
+							style={product.image
+								? `background-image: url('${product.image}');`
+								: `background-image: radial-gradient(circle at 75% 20%, rgba(255, 255, 255, 0.7), transparent 55%), linear-gradient(135deg, #ff8fcb, #f04aa8);`}
+						></div>
+						<div class="product-image-layer" data-image-secondary></div>
+					</div>
+					<h3 data-product-name={product.id}>{product.name}</h3>
+					{/* <p>{product.description}</p> */}
+					<div class="product-footer">
+						<strong data-product-price={product.id}>{product.displayPrice}</strong>
+                        <button
+                            type="button"
+                            class="add-button"
+                            data-cart-add
+                            data-product-id={product.id}
+                            data-in-stock={product.inStock}
+						>
+							Anadir al carrito
+						</button>
+					</div>
+				</article>
+			))
+		}
+	</div>
+	<div id="popupWarning" class="popup-warning hidden" role="dialog" aria-modal="true" aria-labelledby="popup-title">
+		<div class="popup-card">
+			<div class="popup-icon" aria-hidden="true">!</div>
+			<h3 id="popup-title">Atencion</h3>
+			<p id="checkout-error" class="popup-message" role="alert" aria-live="polite"></p>
+			<button id="btnClose" class="popup-close" type="button">Entendido</button>
+		</div>
+	</div>
+	<!-- <div class="checkout-legal">
+		<label for="legal-consent">
+			<input id="legal-consent" type="checkbox" />
+			<span>
+				Acepto los
+				<a href="/legal/terminos" target="_blank" rel="noopener noreferrer">Terminos</a>,
+				<a href="/legal/privacidad" target="_blank" rel="noopener noreferrer">Privacidad</a>
+				y
+				<a href="/legal/reembolsos" target="_blank" rel="noopener noreferrer">Reembolsos</a>.
+			</span>
+		</label>
+	</div> -->
+</section>
+<CartDrawer />
+
+<script>
+import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
+import { initThemeToggle } from '../scripts/theme-toggle.js';
+const imageRotators = new WeakMap();
+
+window.handleProductCardClick = (event) => {
+    const productLink = event.currentTarget.dataset.productLink;
+
+    if (productLink) {
+        window.location.href = productLink;
+    }
+};
+
+window.handleProductCardKeydown = (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+    }
+
+    event.preventDefault();
+    window.handleProductCardClick(event);
+};
+
+const resetProductRotator = (imageElement) => {
+    const state = imageRotators.get(imageElement);
+
+    if (!state) {
+        return;
+    }
+
+    window.clearInterval(state.intervalId);
+    state.index = 0;
+    state.activeLayer = 'primary';
+    state.intervalId = 0;
+    state.primary.style.backgroundImage = `url('${state.images[0]}')`;
+    state.primary.classList.add('is-active');
+    state.secondary.classList.remove('is-active');
+    imageRotators.set(imageElement, state);
+};
+
+const startProductRotator = (imageElement) => {
+    const images = (imageElement.dataset.productImages || '')
+        .split('|')
+        .map((image) => image.trim())
+        .filter(Boolean);
+
+    if (images.length < 2) {
+        return;
+    }
+
+    const primary = imageElement.querySelector('[data-image-primary]');
+    const secondary = imageElement.querySelector('[data-image-secondary]');
+
+    if (!primary || !secondary) {
+        return;
+    }
+
+    const currentState = imageRotators.get(imageElement);
+
+    if (currentState?.intervalId) {
+        return;
+    }
+
+    const state = currentState ?? {
+        images,
+        index: 0,
+        intervalId: 0,
+        activeLayer: 'primary',
+        primary,
+        secondary,
+    };
+
+    state.primary.style.backgroundImage = `url('${images[0]}')`;
+
+    state.intervalId = window.setInterval(() => {
+        state.index = (state.index + 1) % images.length;
+        const nextImage = images[state.index];
+        const showPrimary = state.activeLayer === 'secondary';
+        const nextLayer = showPrimary ? state.primary : state.secondary;
+        const currentLayer = showPrimary ? state.secondary : state.primary;
+
+        nextLayer.style.backgroundImage = `url('${nextImage}')`;
+        nextLayer.classList.add('is-active');
+        currentLayer.classList.remove('is-active');
+        state.activeLayer = showPrimary ? 'primary' : 'secondary';
+    }, 850);
+
+    imageRotators.set(imageElement, state);
+};
+
+document.querySelectorAll('.product-image').forEach((imageElement) => {
+    imageElement.addEventListener('mouseenter', () => {
+        startProductRotator(imageElement);
+    });
+
+    imageElement.addEventListener('mouseleave', () => {
+        resetProductRotator(imageElement);
+    });
+});
+
+initBarMenuScroll();
+initThemeToggle();
+</script>

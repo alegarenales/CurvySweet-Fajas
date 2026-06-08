@@ -1,0 +1,321 @@
+---
+import './CSS/Login.css';
+---
+
+<section class="login-shell">
+	<div class="login-glow login-glow-left" aria-hidden="true"></div>
+	<div class="login-glow login-glow-right" aria-hidden="true"></div>
+
+	<div class="login-layout">
+		<aside class="login-copy">
+			<p class="login-eyebrow">CurvySweet</p>
+			<h1>Inicia sesion de forma sencilla</h1>
+			<p class="login-description">
+				Un acceso visualmente suave, femenino y actual para que el primer vistazo ya se
+				sienta como marca.
+			</p>
+
+			<div class="login-highlights">
+				<div class="highlight-card">
+					<span class="highlight-number">01</span>
+					<p>Nadie puede ver tu contrasena.</p>
+				</div>
+				<div class="highlight-card">
+					<span class="highlight-number">02</span>
+					<p>Campos mas claros, agradables al foco y faciles de recorrer.</p>
+				</div>
+			</div>
+		</aside>
+
+		<div class="login-card" data-auth-mode="login">
+			<div class="login-card-header">
+				<div class="login-card-topbar">
+					<p class="login-badge">Bienvenida</p>
+					<a class="back-home" href="/">Volver a casa</a>
+				</div>
+
+				<div class="auth-toggle" role="tablist" aria-label="Cambiar formulario">
+					<button
+						type="button"
+						class="auth-tab is-active"
+						data-auth-target="login"
+						role="tab"
+						aria-selected="true"
+					>
+						Iniciar sesion
+					</button>
+					<button
+						type="button"
+						class="auth-tab"
+						data-auth-target="register"
+						role="tab"
+						aria-selected="false"
+					>
+						Registrarse
+					</button>
+				</div>
+
+				<p class="auth-subtitle" data-auth-subtitle>Introduzca sus datos</p>
+			</div>
+
+			<div class="auth-panels">
+				<form
+					class="login-form auth-panel is-active"
+					data-auth-panel="login"
+					method="POST"
+					action="/api/login"
+				>
+					<!-- <div class="input-grid">
+						<label class="input-box">
+							<span>Nombre</span>
+							<input type="text" placeholder="Tu nombre" />
+						</label>
+						<label class="input-box">
+							<span>Apellido</span>
+							<input type="text" placeholder="Tu apellido" />
+						</label>
+					</div> -->
+
+					<label class="input-box">
+						<span>Usuario</span>
+						<input type="text" placeholder="@curvysweet (no obligatorio)" />
+					</label>
+
+					<label class="input-box">
+						<span>Email</span>
+						<input name="mail" type="email" placeholder="correo electronico" required />
+					</label>
+
+					<label class="input-box">
+						<span>Contrasena</span>
+						<input name="password" type="password" placeholder="********" required />
+					</label>
+
+					<div class="remember-forgot">
+						<label class="remember-option">
+							<input type="checkbox" />
+							<span>Recordarme</span>
+						</label>
+						<a href="#">Has olvidado tu contrasena?</a>
+					</div>
+
+					<button type="submit" class="btn">Entrar</button>
+
+					<p class="form-message" data-login-message aria-live="polite"></p>
+
+					<div class="register-link">
+						<span>Aun no tienes cuenta?</span>
+						<button type="button" class="text-link" data-auth-target="register">
+							Crear perfil
+						</button>
+					</div>
+				</form>
+
+				<form
+					class="login-form auth-panel"
+					data-auth-panel="register"
+					aria-hidden="true"
+					method="POST"
+					action="/api/register"
+				>
+					<div class="input-grid">
+						<label class="input-box">
+							<span>Nombre</span>
+							<input name="name" type="text" placeholder="Tu nombre" required />
+						</label>
+						<label class="input-box">
+							<span>Apellido</span>
+							<input name="lastName" type="text" placeholder="Tu apellido" required />
+						</label>
+					</div>
+
+					<label class="input-box">
+						<span>Usuario</span>
+						<input name="username" type="text" placeholder="@nuevo_perfil" required />
+					</label>
+
+					<label class="input-box">
+						<span>Email</span>
+						<input name="mail" type="email" placeholder="correo electronico" required />
+					</label>
+
+					<div class="input-grid">
+						<label class="input-box">
+							<span>Contrasena</span>
+							<input name="password" type="password" placeholder="********" required />
+						</label>
+						<label class="input-box">
+							<span>Repetir contrasena</span>
+							<input name="repeatPassword" type="password" placeholder="********" required />
+						</label>
+					</div>
+
+					<label class="remember-option remember-policy">
+						<input type="checkbox" />
+						<span>Acepto los terminos y la politica de privacidad</span>
+					</label>
+
+					<button type="submit" class="btn">Crear cuenta</button>
+
+					<p class="form-message" data-register-message aria-live="polite"></p>
+
+					<div class="register-link">
+						<span>Ya tienes cuenta?</span>
+						<button type="button" class="text-link" data-auth-target="login">
+							Entrar aqui
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+
+<button id="theme-toggle" type="button">Modo oscuro</button>
+
+
+<script>
+	import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
+	import { initThemeToggle } from '../scripts/theme-toggle.js';
+
+	initBarMenuScroll();
+	initThemeToggle();
+
+	const authCard = document.querySelector('[data-auth-mode]');
+	const authTabs = document.querySelectorAll('[data-auth-target]');
+	const authPanels = document.querySelectorAll('[data-auth-panel]');
+	const authSubtitle = document.querySelector('[data-auth-subtitle]');
+
+	const subtitles = {
+		login: 'Introduzca sus datos',
+		register: 'Crea tu cuenta con una transicion suave y visualmente agradable',
+	};
+
+	const setAuthMode = (mode) => {
+		if (!authCard) return;
+
+		authCard.dataset.authMode = mode;
+		authSubtitle.textContent = subtitles[mode];
+
+		authTabs.forEach((tab) => {
+			const isActive = tab.dataset.authTarget === mode;
+			tab.classList.toggle('is-active', isActive);
+
+			if (tab.classList.contains('auth-tab')) {
+				tab.setAttribute('aria-selected', String(isActive));
+			}
+		});
+
+		authPanels.forEach((panel) => {
+			const isActive = panel.dataset.authPanel === mode;
+			panel.classList.toggle('is-active', isActive);
+			panel.setAttribute('aria-hidden', String(!isActive));
+		});
+	};
+
+	authTabs.forEach((tab) => {
+		tab.addEventListener('click', () => {
+			setAuthMode(tab.dataset.authTarget);
+		});
+	});
+
+	const loginForm = document.querySelector('[data-auth-panel="login"]');
+	const loginMessage = document.querySelector('[data-login-message]');
+	const registerForm = document.querySelector('[data-auth-panel="register"]');
+	const registerMessage = document.querySelector('[data-register-message]');
+
+	const showLoginMessage = (message, isSuccess) => {
+		if (!loginMessage) return;
+
+		loginMessage.textContent = message;
+		loginMessage.classList.toggle('is-success', isSuccess);
+		loginMessage.classList.toggle('is-error', !isSuccess);
+	};
+
+	const showRegisterMessage = (message, isSuccess) => {
+		if (!registerMessage) return;
+
+		registerMessage.textContent = message;
+		registerMessage.classList.toggle('is-success', isSuccess);
+		registerMessage.classList.toggle('is-error', !isSuccess);
+	};
+
+	loginForm?.addEventListener('submit', async (event) => {
+		event.preventDefault();
+
+		const submitButton = loginForm.querySelector('button[type="submit"]');
+		const formData = new FormData(loginForm);
+
+		showLoginMessage('Iniciando sesion...', true);
+
+		if (submitButton) {
+			submitButton.disabled = true;
+		}
+
+		try {
+			const response = await fetch(loginForm.action, {
+				method: 'POST',
+				body: formData,
+			});
+			const result = await response.json().catch(() => ({
+				ok: false,
+				message: 'El servidor no devolvio una respuesta valida.',
+			}));
+
+			showLoginMessage(result.message ?? 'No se recibio mensaje del servidor.', result.ok);
+
+			if (result.ok) {
+				localStorage.setItem('curvysweetUser', JSON.stringify(result.user));
+				loginForm.reset();
+				window.setTimeout(() => {
+					window.location.href = '/';
+				}, 900);
+			}
+		} catch (error) {
+			console.error(error);
+			showLoginMessage('No se pudo iniciar sesion.', false);
+		} finally {
+			if (submitButton) {
+				submitButton.disabled = false;
+			}
+		}
+	});
+
+	registerForm?.addEventListener('submit', async (event) => {
+		event.preventDefault();
+
+		const submitButton = registerForm.querySelector('button[type="submit"]');
+		const formData = new FormData(registerForm);
+
+		showRegisterMessage('Creando cuenta...', true);
+
+		if (submitButton) {
+			submitButton.disabled = true;
+		}
+
+		try {
+			const response = await fetch(registerForm.action, {
+				method: 'POST',
+				body: formData,
+			});
+			const result = await response.json();
+
+			showRegisterMessage(result.message ?? 'No se recibio mensaje del servidor.', result.ok);
+
+			if (result.ok) {
+				localStorage.setItem('curvysweetUser', JSON.stringify(result.user));
+				registerForm.reset();
+				window.setTimeout(() => {
+					window.location.href = '/';
+				}, 900);
+			}
+		} catch (error) {
+			console.error(error);
+			showRegisterMessage('No se pudo completar el registro.', false);
+		} finally {
+			if (submitButton) {
+				submitButton.disabled = false;
+			}
+		}
+	});
+</script>

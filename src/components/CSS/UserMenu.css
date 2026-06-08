@@ -1,0 +1,101 @@
+.user-menu {
+  position: relative;
+}
+
+.user-menu-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--surface-border, var(--menu-border, rgba(255, 255, 255, 0.68)));
+  border-radius: 999px;
+  padding: 8px 12px 8px 8px;
+  background: var(--surface-strong, var(--menu-surface, rgba(255, 255, 255, 0.9)));
+  color: var(--link-color, var(--text-main, #402645));
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent, #e45596), var(--accent-strong, #c93178));
+  color: white;
+  font-size: 0.92rem;
+}
+
+.user-avatar[data-avatar-style="sunset"] {
+  background: linear-gradient(135deg, #ff7b66, #ffb347);
+}
+
+.user-avatar[data-avatar-style="mint"] {
+  background: linear-gradient(135deg, #35d6a6, #58a6ff);
+}
+
+.user-avatar[data-avatar-style="midnight"] {
+  background: linear-gradient(135deg, #35384f, #9a72ff);
+}
+
+.user-avatar[data-avatar-style="lemon"] {
+  background: linear-gradient(135deg, #ffd84d, #ff7d91);
+}
+
+.user-menu-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  display: grid;
+  min-width: 180px;
+  padding: 8px;
+  border-radius: 18px;
+  background: var(--surface-strong, var(--menu-surface, rgba(255, 255, 255, 0.9)));
+  border: 1px solid var(--surface-border, var(--menu-border, rgba(255, 255, 255, 0.68)));
+  box-shadow: var(--shadow-soft, var(--menu-shadow, 0 24px 70px rgba(154, 73, 116, 0.16)));
+  backdrop-filter: blur(18px);
+}
+
+.user-menu-panel[hidden] {
+  display: none;
+}
+
+.user-menu-panel a,
+.user-menu-panel button {
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: transparent;
+  color: var(--link-color, var(--text-main, #402645));
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.user-menu-panel a:hover,
+.user-menu-panel button:hover {
+  background: var(--accent-soft, rgba(228, 85, 150, 0.12));
+  color: var(--accent-strong, #c93178);
+}
+
+@media (max-width: 768px) {
+  .user-menu {
+    display: grid;
+  }
+
+  .user-menu-button {
+    justify-content: center;
+    text-align: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .user-menu-panel {
+    position: static;
+    margin-top: 8px;
+  }
+}

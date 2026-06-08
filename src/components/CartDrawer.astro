@@ -1,0 +1,55 @@
+---
+import { getProducts } from '../lib/catalog';
+import './CSS/cart.css';
+
+const cartProducts = getProducts().map((product) => ({
+	id: product.id,
+	name: product.name,
+	price: product.displayPrice,
+	image: product.image ?? '',
+	inStock: product.inStock,
+	link: product.link ?? '/shop',
+}));
+---
+
+<script id="curvysweet-cart-products" type="application/json" set:html={JSON.stringify(cartProducts)}></script>
+
+<div class="cart-overlay" data-cart-overlay hidden></div>
+
+<aside class="cart-drawer" data-cart-drawer aria-hidden="true" aria-label="Carrito">
+	<div class="cart-drawer-header">
+		<div>
+			<p class="cart-kicker">CurvySweet</p>
+			<h2>Carrito</h2>
+		</div>
+		<button class="cart-icon-button" type="button" data-cart-close aria-label="Cerrar carrito">x</button>
+	</div>
+
+	<div class="cart-empty" data-cart-empty>
+		<p>Tu carrito esta vacio.</p>
+		<a href="/shop">Ver productos</a>
+	</div>
+
+	<div class="cart-items" data-cart-items></div>
+
+	<div class="cart-drawer-footer">
+		<p class="cart-stock-warning" data-cart-stock-warning hidden>
+			Hay productos sin stock. Quitalos del carrito para poder finalizar la compra.
+		</p>
+		<p class="cart-error" data-cart-error hidden></p>
+		<div class="cart-total-row">
+			<span>Total estimado</span>
+			<strong data-cart-total>0 EUR</strong>
+		</div>
+		<div class="cart-footer-actions">
+			<button class="cart-secondary-button" type="button" data-cart-clear>Vaciar</button>
+			<button class="cart-primary-button" type="button" data-cart-checkout>Finalizar compra</button>
+		</div>
+	</div>
+</aside>
+
+<script>
+	import { initCurvySweetCart } from '../scripts/cart.js';
+
+	initCurvySweetCart();
+</script>

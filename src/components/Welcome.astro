@@ -1,0 +1,93 @@
+---
+import UserMenu from './UserMenu.astro';
+import './CSS/Welcome.css';
+---
+
+<div id="bar-menu">
+	<nav>
+		<a id="logo" href=".">CurvySweet</a>
+		<div class="nav">
+			<a href=".">Home</a>
+			<a href="/shop">Tienda</a>
+			<a href="/login" data-guest-link>Iniciar Sesion</a>
+			<a href="/register" data-guest-link>Registrarse</a>
+			<UserMenu />
+			<button id="theme-toggle" type="button">Modo oscuro</button>
+		</div>
+	</nav>
+</div>
+
+<section class="welcome-hero">
+	<div class="welcome-glow welcome-glow-left" aria-hidden="true"></div>
+	<div class="welcome-glow welcome-glow-right" aria-hidden="true"></div>
+
+	<div class="welcome-grid">
+		<div class="welcome-copy">
+			<p class="welcome-kicker">CurvySweet Collection</p>
+			<h1>Prendas que abrazan tu silueta con una imagen mas suave y actual.</h1>
+			<p class="welcome-lead">
+				Una tienda pensada para realzar curvas con estilo, comodidad y una experiencia
+				visualmente mas cuidada desde el primer vistazo.
+			</p>
+
+			<div class="welcome-actions">
+				<a class="primary-cta" href="/shop">Explorar tienda</a>
+				<a class="secondary-cta" href="/login">Entrar a mi cuenta</a>
+			</div>
+
+			<div class="welcome-stats">
+				<article class="stat-card">
+					<span class="stat-label">Envios</span>
+					<div class="shipping-belt" aria-label="Animacion de control de paquetes">
+						<div class="belt-track" aria-hidden="true">
+							<span class="quality-line"></span>
+							<div class="package package-one"><span></span></div>
+							<div class="package package-two"><span></span></div>
+							<div class="package package-three"><span></span></div>
+						</div>
+					</div>
+					<p>Paquetes revisados antes de salir hacia tu pedido.</p>
+				</article>
+				<article class="stat-card">
+					<span class="stat-label">Visitas</span>
+					<strong id="visits-value">0</strong>
+					<p id="visits-count">Personas que ya han pasado por CurvySweet.</p>
+				</article>
+			</div>
+		</div>
+
+		<div class="welcome-visual">
+			<div class="hero-card hero-card-main">
+				<p class="card-kicker">Nueva estetica</p>
+				<h2>Elegancia ligera para sentirte segura en cada look.</h2>
+				<div class="hero-pills">
+					<span>Moldeo suave</span>
+					<span>Acabado premium</span>
+					<span>Uso diario</span>
+				</div>
+			</div>
+
+			<div class="hero-card hero-card-side">
+				<p class="card-kicker">Favoritas</p>
+				<div class="mini-feature">
+					<strong>Faja chaleco cinturilla</strong>
+					<span>Compresion comoda y silueta definida.</span>
+				</div>
+				<div class="mini-feature">
+					<strong>Cinturilla reloj arena</strong>
+					<span>Una opcion pensada para remarcar cintura con estilo.</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
+	import { initThemeToggle } from '../scripts/theme-toggle.js';
+	import { countVisits } from '../scripts/count_visits.js';
+
+	initBarMenuScroll();
+	initThemeToggle();
+	countVisits();
+</script>

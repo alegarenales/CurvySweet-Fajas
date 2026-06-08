@@ -1,0 +1,173 @@
+---
+import { products } from "../lib/catalog";
+import "./CSS/AdminPanel.css";
+
+type Props = {
+  adminEmail: string;
+};
+
+const { adminEmail } = Astro.props;
+---
+
+<aside
+  class="admin-panel"
+  data-admin-panel
+  data-admin-email={adminEmail}
+  hidden
+  aria-label="Panel de administracion CurvySweet"
+>
+  <div class="admin-panel-tab" aria-hidden="true">
+    <span>CurvySweet Admin</span>
+  </div>
+
+  <div class="admin-panel-inner">
+    <header class="admin-panel-header">
+      <div>
+        <p>CurvySweet Admin</p>
+        <strong>{adminEmail}</strong>
+      </div>
+      <nav class="admin-panel-tabs" aria-label="Secciones del panel">
+        <button type="button" class="is-active" data-admin-tab="catalog">Catalogo</button>
+        <button type="button" data-admin-tab="analytics">Graficas</button>
+        <button type="button" data-admin-tab="users">Usuarios</button>
+        <button type="button" data-admin-tab="site">Sitio</button>
+      </nav>
+    </header>
+
+    <div class="admin-panel-view is-active" data-admin-view="catalog">
+      <section class="admin-tool admin-tool-wide">
+        <div class="admin-tool-heading">
+          <h2>Productos</h2>
+          <button type="button" data-admin-clear-catalog>Restaurar vista</button>
+        </div>
+
+        <form class="admin-product-form" data-admin-product-form>
+          {
+            products.map((product) => (
+              <fieldset class="admin-product-row">
+                <legend>{product.name}</legend>
+                <label>
+                  <span>Nombre</span>
+                  <input
+                    type="text"
+                    name={`${product.id}:name`}
+                    value={product.name}
+                    data-admin-name-input={product.id}
+                  />
+                </label>
+                <label>
+                  <span>Precio</span>
+                  <input
+                    type="text"
+                    name={`${product.id}:price`}
+                    value={product.displayPrice}
+                    data-admin-price-input={product.id}
+                  />
+                </label>
+              </fieldset>
+            ))
+          }
+          <button type="submit" class="admin-primary-button">Guardar cambios visibles</button>
+        </form>
+      </section>
+
+      <section class="admin-tool">
+        <div class="admin-tool-heading">
+          <h2>Producto nuevo</h2>
+          <button type="button" data-admin-clear-drafts>Limpiar</button>
+        </div>
+
+        <form data-admin-draft-form>
+          <label>
+            <span>Nombre</span>
+            <input type="text" name="name" placeholder="Faja nueva" required />
+          </label>
+          <label>
+            <span>Precio</span>
+            <input type="text" name="price" placeholder="49 EUR" required />
+          </label>
+          <label>
+            <span>Etiqueta</span>
+            <input type="text" name="tag" placeholder="Nuevo" />
+          </label>
+          <button type="submit" class="admin-primary-button">Crear borrador</button>
+        </form>
+
+        <div class="admin-draft-list" data-admin-draft-list></div>
+      </section>
+    </div>
+
+    <div class="admin-panel-view" data-admin-view="analytics">
+      <section class="admin-tool admin-tool-wide">
+        <div class="admin-tool-heading">
+          <h2>Graficas</h2>
+          <button type="button" data-admin-refresh-metrics>Actualizar</button>
+        </div>
+        <div class="admin-chart-grid">
+          <article class="admin-chart-card">
+            <h3>Mas visto</h3>
+            <div class="admin-bar-list" data-chart-views></div>
+          </article>
+          <article class="admin-chart-card">
+            <h3>Mas comprado</h3>
+            <div class="admin-bar-list" data-chart-purchases></div>
+          </article>
+          <article class="admin-chart-card">
+            <h3>Mas demandado</h3>
+            <div class="admin-bar-list" data-chart-demand></div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <div class="admin-panel-view" data-admin-view="users">
+      <section class="admin-tool admin-tool-wide">
+        <div class="admin-tool-heading">
+          <h2>Bloqueo de usuarios</h2>
+          <button type="button" data-admin-refresh-users>Cargar usuarios</button>
+        </div>
+        <form class="admin-user-form" data-admin-user-form>
+          <label>
+            <span>Usuario</span>
+            <select name="userId" data-admin-user-select>
+              <option value="">Carga usuarios para seleccionar</option>
+            </select>
+          </label>
+          <label>
+            <span>Accion</span>
+            <select name="state">
+              <option value="1">Bloquear</option>
+              <option value="3">Activar</option>
+            </select>
+          </label>
+          <button type="submit" class="admin-primary-button">Aplicar</button>
+        </form>
+        <div class="admin-user-list" data-admin-user-list></div>
+      </section>
+    </div>
+
+    <div class="admin-panel-view" data-admin-view="site">
+      <section class="admin-tool admin-tool-actions">
+        <h2>Sitio</h2>
+        <label class="admin-switch">
+          <input type="checkbox" data-maintenance-toggle />
+          <span>Pagina en mantenimiento</span>
+        </label>
+        <p class="admin-help-text">
+          Cuando este activo, los visitantes ven una pantalla de mantenimiento. Tu usuario admin puede seguir navegando.
+        </p>
+        <a href="/shop">Ver tienda</a>
+        <a href="/login">Cambiar usuario</a>
+        <button type="button" data-admin-logout>Salir</button>
+      </section>
+    </div>
+
+    <p class="admin-panel-status" data-admin-panel-status aria-live="polite"></p>
+  </div>
+</aside>
+
+<script>
+  import { initAdminPanel } from "../scripts/admin-panel.js";
+
+  initAdminPanel();
+</script>

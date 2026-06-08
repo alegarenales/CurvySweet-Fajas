@@ -1,0 +1,260 @@
+---
+import background from '../assets/background.svg';
+import './CSS/ShopSection.css';
+import { getProducts } from '../lib/catalog';
+
+const products = getProducts();
+
+const palette = [
+	{
+		accent: '#ff4eb7',
+		accentSoft: 'rgba(255, 78, 183, 0.2)',
+		glow: 'linear-gradient(135deg, #ffb5dc 0%, #ff4eb7 55%, #8f2fff 100%)',
+	},
+	{
+		accent: '#ff7a59',
+		accentSoft: 'rgba(255, 122, 89, 0.2)',
+		glow: 'linear-gradient(135deg, #ffd0c4 0%, #ff7a59 52%, #ffb347 100%)',
+	},
+	{
+		accent: '#8b5cf6',
+		accentSoft: 'rgba(139, 92, 246, 0.2)',
+		glow: 'linear-gradient(135deg, #d9c8ff 0%, #8b5cf6 48%, #4f46e5 100%)',
+	},
+	{
+		accent: '#14b8a6',
+		accentSoft: 'rgba(20, 184, 166, 0.2)',
+		glow: 'linear-gradient(135deg, #b7fff3 0%, #14b8a6 50%, #0f766e 100%)',
+	},
+];
+
+const slides = (products.length ? products.slice(0, 3) : [ /* fallback */ ])
+  .map((product, index) => ({
+    ...product,
+    ...palette[index % palette.length],
+    index,
+  }));
+---
+
+<section class="shop-carousel-section" aria-label="Productos destacados">
+	<div class="shop-carousel-heading">
+		<p class="shop-carousel-kicker">CurvySweet Shop</p>
+		<h2>Tu escaparate principal</h2>
+		<p class="shop-carousel-subtitle">
+			Productos destacados y mas vendidos
+		</p>
+	</div>
+
+	<div
+		class="shop-carousel"
+		data-shop-carousel
+		role="region"
+		aria-roledescription="carousel"
+		aria-label="Carrusel de productos"
+	>
+		<div class="shop-carousel-viewport">
+			<div class="shop-carousel-track" data-carousel-track>
+				{
+					slides.map((slide, index) => (
+						<article
+							class="shop-slide"
+							data-slide
+							aria-roledescription="slide"
+							aria-label={`Slide ${index + 1} de ${slides.length}`}
+							aria-hidden={index === 0 ? 'false' : 'true'}
+							style={`--slide-accent:${slide.accent}; --slide-accent-soft:${slide.accentSoft}; --slide-glow:${slide.glow};`}
+						>
+							<div class="shop-slide-copy">
+								<span class="shop-slide-tag">{slide.tag}</span>
+								<h3 data-product-name={slide.id}>{slide.name}</h3>
+								<p>{slide.description}</p>
+								<div class="shop-slide-meta">
+									<strong data-product-price={slide.id}>{slide.displayPrice}</strong>
+									<a class="shop-slide-link" href="/shop">
+										Ver tienda
+									</a>
+								</div>
+							</div>
+
+							<div class="shop-slide-visual" aria-hidden="true">
+								<div class="shop-slide-card">
+									<img src={background.src} alt="" loading="lazy" />
+									<div class="shop-slide-orb shop-slide-orb-one"></div>
+									<div class="shop-slide-orb shop-slide-orb-two"></div>
+									<div class="shop-slide-label">
+										<span>CurvySweet</span>
+										<strong data-product-name={slide.id}>{slide.name}</strong>
+									</div>
+								</div>
+							</div>
+						</article>
+					))
+				}
+			</div>
+		</div>
+
+		<div class="shop-carousel-controls">
+			<button
+				type="button"
+				class="shop-carousel-arrow"
+				data-carousel-prev
+				aria-label="Producto anterior"
+			>
+				<span aria-hidden="true">←</span>
+			</button>
+
+			<div class="shop-carousel-dots" role="tablist" aria-label="Seleccionar slide">
+				{
+					slides.map((slide, index) => (
+						<button
+							type="button"
+							class={`shop-carousel-dot ${index === 0 ? 'is-active' : ''}`}
+							data-carousel-dot
+							data-index={index}
+							role="tab"
+							aria-selected={index === 0 ? 'true' : 'false'}
+							aria-label={`Ir a ${slide.name}`}
+						></button>
+					))
+				}
+			</div>
+
+			<button
+				type="button"
+				class="shop-carousel-arrow"
+				data-carousel-next
+				aria-label="Siguiente producto"
+			>
+				<span aria-hidden="true">→</span>
+			</button>
+		</div>
+	</div>
+</section>
+
+<script>
+	const carousels = document.querySelectorAll('[data-shop-carousel]');
+	const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	carousels.forEach((carousel) => {
+		const track = carousel.querySelector('[data-carousel-track]');
+		const slides = Array.from(carousel.querySelectorAll('[data-slide]'));
+		const dots = Array.from(carousel.querySelectorAll('[data-carousel-dot]'));
+		const prevButton = carousel.querySelector('[data-carousel-prev]');
+		const nextButton = carousel.querySelector('[data-carousel-next]');
+
+		if (!track || !slides.length || !prevButton || !nextButton) return;
+
+		let currentIndex = 0;
+		let autoplayId = 0;
+		let isPaused = false;
+		let pointerStartX = 0;
+		let pointerDeltaX = 0;
+
+		const render = (index) => {
+			currentIndex = (index + slides.length) % slides.length;
+			track.style.transform = `translate3d(-${currentIndex * 100}%, 0, 0)`;
+
+			slides.forEach((slide, slideIndex) => {
+				const isActive = slideIndex === currentIndex;
+				slide.classList.toggle('is-active', isActive);
+				slide.setAttribute('aria-hidden', String(!isActive));
+			});
+
+			dots.forEach((dot, dotIndex) => {
+				const isActive = dotIndex === currentIndex;
+				dot.classList.toggle('is-active', isActive);
+				dot.setAttribute('aria-selected', String(isActive));
+			});
+		};
+
+		const stopAutoplay = () => {
+			window.clearInterval(autoplayId);
+		};
+
+		const startAutoplay = () => {
+			stopAutoplay();
+			if (reducedMotion || isPaused || slides.length < 2) return;
+			autoplayId = window.setInterval(() => render(currentIndex + 1), 4500);
+		};
+
+		prevButton.addEventListener('click', () => {
+			render(currentIndex - 1);
+			startAutoplay();
+		});
+
+		nextButton.addEventListener('click', () => {
+			render(currentIndex + 1);
+			startAutoplay();
+		});
+
+		dots.forEach((dot) => {
+			dot.addEventListener('click', () => {
+				const index = Number(dot.dataset.index || 0);
+				render(index);
+				startAutoplay();
+			});
+		});
+
+		carousel.addEventListener('mouseenter', () => {
+			isPaused = true;
+			stopAutoplay();
+		});
+
+		carousel.addEventListener('mouseleave', () => {
+			isPaused = false;
+			startAutoplay();
+		});
+
+		carousel.addEventListener('focusin', () => {
+			isPaused = true;
+			stopAutoplay();
+		});
+
+		carousel.addEventListener('focusout', () => {
+			isPaused = false;
+			startAutoplay();
+		});
+
+		carousel.addEventListener('keydown', (event) => {
+			if (event.key === 'ArrowLeft') {
+				event.preventDefault();
+				render(currentIndex - 1);
+				startAutoplay();
+			}
+
+			if (event.key === 'ArrowRight') {
+				event.preventDefault();
+				render(currentIndex + 1);
+				startAutoplay();
+			}
+		});
+
+		carousel.addEventListener('pointerdown', (event) => {
+			pointerStartX = event.clientX;
+			pointerDeltaX = 0;
+		});
+
+		carousel.addEventListener('pointermove', (event) => {
+			if (!pointerStartX) return;
+			pointerDeltaX = event.clientX - pointerStartX;
+		});
+
+		carousel.addEventListener('pointerup', () => {
+			if (Math.abs(pointerDeltaX) > 50) {
+				render(currentIndex + (pointerDeltaX < 0 ? 1 : -1));
+				startAutoplay();
+			}
+
+			pointerStartX = 0;
+			pointerDeltaX = 0;
+		});
+
+		carousel.addEventListener('pointercancel', () => {
+			pointerStartX = 0;
+			pointerDeltaX = 0;
+		});
+
+		render(0);
+		startAutoplay();
+	});
+</script>

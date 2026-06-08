@@ -1,0 +1,32 @@
+{
+  "faja_chaleco_cinturilla": {
+    "name": "Faja Chaleco Cinturilla",
+    "price": "55 EUR",
+    "image": "/products/faja chaleco cinturilla/faja_chaleco_cinturilla_1.jpg",
+    "stock": "in"
+  },
+  "cinturilla_reloj_arena": {
+    "name": "Cinturilla Reloj Arena",
+    "price": "50 EUR",
+    "image": "/products/faja cinturilla efecto reloj de arena/faja_cinturilla_efecto_reloj_de_arena_1.jpg",
+    "stock": "in"
+  },
+  "faja_control_abdominal": {
+    "name": "Faja Moldeadora Reductora",
+    "price": "48 EUR",
+    "image": "/products/faja moldeadora reductora - control total/faja_moldeadora-reductora_1.jpg",
+    "stock": "out"
+  },
+  "faja_latex": {
+    "name": "Faja Latex",
+    "price": "45 EUR",
+    "image": "/products/faja de latex/faja_de_latex_1.jpg",
+    "stock": "in"
+  },
+  "faja_moldeadora": {
+    "name": "Faja Short Moldeadora",
+    "price": "45 EUR",
+    "image": "/products/faja short moldeadora/faja_short_moldeadora_4.jpg",
+    "stock": "in"
+  }
+}
