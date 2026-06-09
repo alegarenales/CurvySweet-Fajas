@@ -256,6 +256,7 @@ import './CSS/Login.css';
 			const response = await fetch(loginForm.action, {
 				method: 'POST',
 				body: formData,
+				mode: 'same-origin',
 			});
 			const result = await response.json().catch(() => ({
 				ok: false,

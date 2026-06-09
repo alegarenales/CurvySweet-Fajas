@@ -87,7 +87,5 @@ export default defineConfig({
     integrations: [curvySweetDevToolbar()],
     adapter: vercel(),
     site: 'https://curvysweet.com',
-    security: {
-        checkOrigin: false,
-    },
+        
 });
