@@ -1,0 +1,32 @@
+---
+import UserMenu from './UserMenu.astro';
+import './CSS/Welcome.css';
+---
+
+<div id="bar-menu">
+    <nav>
+        <a id="logo" href=".">CurvySweet</a>
+        <div class="nav">
+            <a href=".">Home</a>
+            <a href="/shop">Tienda</a>
+            <a href="/login" data-guest-link>Iniciar Sesion</a>
+            <a href="/register" data-guest-link>Registrarse</a>
+            <UserMenu />
+            <button id="theme-toggle" type="button">Modo oscuro</button>
+        </div>
+    </nav>
+
+    <button id="menu-toggle-btn" type="button" aria-label="Expandir/Minimizar menú">
+        <span class="menu-toggle-icon"></span>
+    </button>
+</div>
+
+<script>
+    import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
+    import { initThemeToggle } from '../scripts/theme-toggle.js';
+    import { initMenuToggle } from '../scripts/menu-toggle.js';
+
+    initBarMenuScroll();
+    initThemeToggle();
+    initMenuToggle();
+</script>

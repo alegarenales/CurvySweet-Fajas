@@ -1,9 +1,13 @@
 ---
 import UserMenu from './UserMenu.astro';
-import './CSS/Welcome.css';
+// import './CSS/Welcome.css';
+
+// import BarMenu from '../components/BarMenu.astro';
 ---
 
-<div id="bar-menu">
+<!-- <BarMenu></BarMenu> -->
+
+<!-- <div id="bar-menu">
 	<nav>
 		<a id="logo" href=".">CurvySweet</a>
 		<div class="nav">
@@ -15,7 +19,10 @@ import './CSS/Welcome.css';
 			<button id="theme-toggle" type="button">Modo oscuro</button>
 		</div>
 	</nav>
-</div>
+	<button id="menu-toggle-btn" type="button" aria-label="Expandir/Minimizar menú">
+		<span class="menu-toggle-icon"></span>
+	</button>
+</div> -->
 
 <section class="welcome-hero">
 	<div class="welcome-glow welcome-glow-left" aria-hidden="true"></div>
@@ -83,11 +90,13 @@ import './CSS/Welcome.css';
 </section>
 
 <script>
-	import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
-	import { initThemeToggle } from '../scripts/theme-toggle.js';
+	// import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
+	// import { initThemeToggle } from '../scripts/theme-toggle.js';
+	// import { initMenuToggle } from '../scripts/menu-toggle.js';
 	import { countVisits } from '../scripts/count_visits.js';
 
-	initBarMenuScroll();
-	initThemeToggle();
+	// initBarMenuScroll();
+	// initThemeToggle();
+	// initMenuToggle();
 	countVisits();
 </script>

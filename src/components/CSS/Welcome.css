@@ -191,6 +191,60 @@ body {
 	cursor: pointer;
 }
 
+#menu-toggle-btn {
+	display: none;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	padding: 8px;
+	position: relative;
+	width: 24px;
+	height: 24px;
+}
+
+#menu-toggle-btn .menu-toggle-icon {
+	display: block;
+	width: 24px;
+	height: 2px;
+	background: var(--toggle-text);
+	border-radius: 1px;
+	transition: all 300ms ease;
+	position: relative;
+}
+
+#menu-toggle-btn .menu-toggle-icon::before,
+#menu-toggle-btn .menu-toggle-icon::after {
+	content: '';
+	position: absolute;
+	width: 24px;
+	height: 2px;
+	background: var(--toggle-text);
+	border-radius: 1px;
+	left: 0;
+	transition: all 300ms ease;
+}
+
+#menu-toggle-btn .menu-toggle-icon::before {
+	top: -8px;
+}
+
+#menu-toggle-btn .menu-toggle-icon::after {
+	top: 8px;
+}
+
+#bar-menu.menu-collapsed #menu-toggle-btn .menu-toggle-icon {
+	transform: rotate(45deg);
+	background: transparent;
+}
+
+#bar-menu.menu-collapsed #menu-toggle-btn .menu-toggle-icon::before {
+	transform: translateY(8px) rotate(90deg);
+}
+
+#bar-menu.menu-collapsed #menu-toggle-btn .menu-toggle-icon::after {
+	transform: translateY(-8px) rotate(90deg);
+}
+
 .welcome-hero {
 	position: relative;
 	max-width: 1280px;
@@ -597,10 +651,74 @@ body {
 
 @media (max-width: 768px) {
 	#bar-menu {
+		position: fixed;
 		top: 8px;
-		margin: 0 8px 20px;
+		left: 8px;
+		right: 8px;
+		width: auto;
+		z-index: 20;
+		margin: 0;
 		padding: 12px 14px;
 		border-radius: 18px;
+		transition: all 300ms ease;
+	}
+
+	#menu-toggle-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 0;
+		background: transparent;
+		cursor: pointer;
+		padding: 8px;
+		position: relative;
+		width: 24px;
+		height: 24px;
+	}
+
+	#bar-menu.menu-collapsed {
+		position: fixed !important;
+		top: 12px !important;
+		left: 50% !important;
+		transform: translateX(-50%) !important;
+
+		width: 56px !important;
+		height: 56px !important;
+		min-width: 56px !important;
+		max-width: 56px !important;
+
+		padding: 0 !important;
+		margin: 0 !important;
+
+		border-radius: 50% !important;
+
+		display: flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+
+		z-index: 9999 !important;
+	}
+
+	#bar-menu.menu-collapsed nav {
+		display: none !important;
+	}
+
+	#bar-menu.menu-collapsed #menu-toggle-btn {
+		display: flex !important;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#bar-menu:not(.menu-collapsed) {
+		width: calc(100% - 16px);
+	}
+
+	#bar-menu:not(.menu-collapsed) nav {
+		display: flex !important;
+	}
+
+	#bar-menu.scrolled {
+		transform: none;
 	}
 
 	#bar-menu nav {
@@ -615,6 +733,11 @@ body {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		align-items: stretch;
 		gap: 10px;
+	}
+
+	#theme-toggle,
+	.user-menu {
+    	grid-column: 1 / -1;
 	}
 
 	#bar-menu .nav a,
@@ -641,8 +764,8 @@ body {
 		grid-template-columns: 1fr;
 	}
 
-	.hero-card-main {
-		inset: 0 0 140px 0;
+	.welcome-hero {
+		padding-top: 92px;
 	}
 
 	.hero-card-side {
@@ -650,11 +773,24 @@ body {
 		left: 24px;
 		right: 24px;
 	}
+
+	#bar-menu.menu-collapsed nav,
+	#bar-menu.menu-collapsed {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#bar-menu.menu-collapsed #menu-toggle-btn {
+		display: flex;
+	}
+
+
 }
 
 @media (max-width: 640px) {
 	.welcome-hero {
-		padding: 20px 14px 56px;
+		padding: 92px 14px 56px;
 	}
 
 	.welcome-grid {
@@ -737,3 +873,4 @@ body {
 		animation: none;
 	}
 }
+

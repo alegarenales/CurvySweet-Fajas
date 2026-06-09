@@ -477,7 +477,7 @@ body {
 	background: rgba(255, 220, 198, 0.8);
 }
 
-#theme-toggle {
+/* #theme-toggle {
 	position: fixed;
 	right: 24px;
 	bottom: 24px;
@@ -492,7 +492,7 @@ body {
 	backdrop-filter: blur(14px);
 	box-shadow: 0 14px 30px rgba(62, 24, 50, 0.12);
 	cursor: pointer;
-}
+} */
 
 @media (max-width: 900px) {
 	.login-layout {
@@ -573,10 +573,10 @@ body {
 		text-align: center;
 	}
 
-	#theme-toggle {
+	/* #theme-toggle {
 		right: 16px;
 		bottom: 16px;
-	}
+	} */
 }
 
 @media (max-width: 420px) {

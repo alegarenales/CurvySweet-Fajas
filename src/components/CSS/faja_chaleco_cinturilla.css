@@ -110,6 +110,60 @@ body {
 	cursor: pointer;
 }
 
+#menu-toggle-btn {
+	display: none;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	padding: 8px;
+	position: relative;
+	width: 24px;
+	height: 24px;
+}
+
+#menu-toggle-btn .menu-toggle-icon {
+	display: block;
+	width: 24px;
+	height: 2px;
+	background: var(--toggle-text);
+	border-radius: 1px;
+	transition: all 300ms ease;
+	position: relative;
+}
+
+#menu-toggle-btn .menu-toggle-icon::before,
+#menu-toggle-btn .menu-toggle-icon::after {
+	content: '';
+	position: absolute;
+	width: 24px;
+	height: 2px;
+	background: var(--toggle-text);
+	border-radius: 1px;
+	left: 0;
+	transition: all 300ms ease;
+}
+
+#menu-toggle-btn .menu-toggle-icon::before {
+	top: -8px;
+}
+
+#menu-toggle-btn .menu-toggle-icon::after {
+	top: 8px;
+}
+
+#bar-menu.menu-collapsed #menu-toggle-btn .menu-toggle-icon {
+	transform: rotate(45deg);
+	background: transparent;
+}
+
+#bar-menu.menu-collapsed #menu-toggle-btn .menu-toggle-icon::before {
+	transform: translateY(8px) rotate(90deg);
+}
+
+#bar-menu.menu-collapsed #menu-toggle-btn .menu-toggle-icon::after {
+	transform: translateY(-8px) rotate(90deg);
+}
+
 .product-detail {
 	max-width: 1280px;
 	margin: 0 auto;
@@ -541,14 +595,62 @@ body {
 
 @media (max-width: 680px) {
 	.product-page {
-		padding: 14px 14px 76px;
+		padding: 96px 14px 76px;
 	}
 
 	#bar-menu {
+		position: fixed;
 		top: 8px;
-		margin: 0 0 20px;
+		left: 8px;
+		right: 8px;
+		width: auto;
+		z-index: 20;
+		margin: 0;
 		padding: 12px 14px;
 		border-radius: 18px;
+		transition: all 300ms ease;
+	}
+
+	#menu-toggle-btn {
+		display: none;
+		border: 0;
+		background: transparent;
+		cursor: pointer;
+		padding: 8px;
+		position: relative;
+		width: 24px;
+		height: 24px;
+	}
+
+	#bar-menu.menu-collapsed {
+		width: 48px;
+		height: 48px;
+		padding: 0;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		left: 50%;
+		transform: translateX(-50%);
+		top: 16px;
+	}
+
+	#bar-menu.menu-collapsed nav {
+		display: none;
+	}
+
+	#bar-menu.menu-collapsed #menu-toggle-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#bar-menu:not(.menu-collapsed) {
+		width: calc(100% - 16px);
+	}
+
+	#bar-menu.scrolled {
+		transform: none;
 	}
 
 	#bar-menu nav {

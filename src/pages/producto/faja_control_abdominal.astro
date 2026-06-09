@@ -39,6 +39,9 @@ const secondaryImages = product.gallery.slice(1);
 						<button id="theme-toggle" type="button">Modo oscuro</button>
 					</div>
 				</nav>
+				<button id="menu-toggle-btn" type="button" aria-label="Expandir/Minimizar menú">
+					<span class="menu-toggle-icon"></span>
+				</button>
 			</div>
 
 			<main class="product-detail">
@@ -251,8 +254,10 @@ const secondaryImages = product.gallery.slice(1);
 
 <script>
 	import { initThemeToggle } from '../../scripts/theme-toggle.js';
+	import { initMenuToggle } from '../../scripts/menu-toggle.js';
 
 	initThemeToggle();
+	initMenuToggle();
 
 	document.querySelectorAll('[data-option-group]').forEach((group) => {
 		const buttons = group.querySelectorAll('[data-option-button]');

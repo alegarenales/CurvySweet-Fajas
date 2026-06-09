@@ -7,7 +7,7 @@ import { getProducts } from '../lib/catalog';
 import './CSS/shop.css';
 const products = getProducts();
 ---
-<div id="bar-menu">
+<!-- <div id="bar-menu">
     <nav>
         <a id="logo" href=".">CurvySweet</a>
         <div class="nav">
@@ -23,8 +23,11 @@ const products = getProducts();
             <button id="theme-toggle" type="button">Modo oscuro</button>
         </div>
     </nav>
+    <button id="menu-toggle-btn" type="button" aria-label="Expandir/Minimizar menú">
+        <span class="menu-toggle-icon"></span>
+    </button>
 
-</div>
+</div> -->
 <section class="shop-section" id="shop">
 	<div class="shop-header">
 		<p class="shop-kicker">CurvySweet</p>
@@ -116,8 +119,9 @@ const products = getProducts();
 <CartDrawer />
 
 <script>
-import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
-import { initThemeToggle } from '../scripts/theme-toggle.js';
+// import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
+// import { initThemeToggle } from '../scripts/theme-toggle.js';
+// import { initMenuToggle } from '../scripts/menu-toggle.js';
 const imageRotators = new WeakMap();
 
 window.handleProductCardClick = (event) => {
@@ -214,6 +218,7 @@ document.querySelectorAll('.product-image').forEach((imageElement) => {
     });
 });
 
-initBarMenuScroll();
-initThemeToggle();
+// initBarMenuScroll();
+// initThemeToggle();
+// initMenuToggle();
 </script>

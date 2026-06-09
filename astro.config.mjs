@@ -9,11 +9,7 @@ function curvySweetDevToolbar() {
             'astro:config:setup': ({ command, addDevToolbarApp, injectScript }) => {
                 // Mueve la notificación de "sitio en pruebas" al bloque de desarrollo
 
-                if (command !== 'dev') {
-                    return;
-                }
-
-                // Inyectar aviso de entorno de desarrollo (solo en `astro dev`).
+                // Inyectar aviso (ahora se muestra también fuera de `dev`).
                 injectScript('page', `
                     const TEST_NOTICE_KEY = 'curvysweetTestNoticeDismissed';
 
