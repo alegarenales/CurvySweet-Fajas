@@ -19,4 +19,6 @@ export function initMenuToggle() {
 			barMenu.classList.add('menu-collapsed');
 		});
 	});
+
+    console.log('Menu toggle inicializado');
 }

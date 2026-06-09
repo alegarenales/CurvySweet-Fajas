@@ -2,14 +2,20 @@
 import Shop_page from '../components/conf_shop.astro';
 import BarMenu from '../components/BarMenu.astro';
 ---
+
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Tienda</title>
-    </head>
-    <body>
-        <BarMenu></BarMenu>
-        <Shop_page></Shop_page>
-    </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1"
+		/>
+		<title>Tienda</title>
+	</head>
+
+	<body>
+		<BarMenu showCart={true} />
+
+		<Shop_page />
+	</body>
 </html>

@@ -751,6 +751,14 @@ body {
 		border: 1px solid var(--surface-border);
 	}
 
+	#bar-menu .nav a[hidden] {
+		display: none !important;
+	}
+
+	.user-menu[hidden] {
+		display: none !important;
+	}
+
 	.user-menu {
 		display: grid;
 	}

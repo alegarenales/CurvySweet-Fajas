@@ -1,83 +1,121 @@
 const USER_STORAGE_KEY = "curvysweetUser";
 
 function readStoredUser() {
-  try {
-    return JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || "null");
-  } catch {
-    return null;
-  }
+	try {
+		return JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || "null");
+	} catch {
+		return null;
+	}
 }
 
 function closeUserMenu(userMenuButton, userMenuPanel) {
-  userMenuButton?.setAttribute("aria-expanded", "false");
+	userMenuButton?.setAttribute("aria-expanded", "false");
 
-  if (userMenuPanel) {
-    userMenuPanel.hidden = true;
-  }
+	if (userMenuPanel) {
+		userMenuPanel.hidden = true;
+	}
 }
 
 export function initUserMenu() {
-  const user = readStoredUser();
-  const guestLinks = document.querySelectorAll("[data-guest-link]");
-  const userMenu = document.querySelector("[data-user-menu]");
-  const userMenuButton = document.querySelector("[data-user-menu-button]");
-  const userMenuPanel = document.querySelector("[data-user-menu-panel]");
-  const userName = document.querySelector("[data-user-name]");
-  const userAvatar = document.querySelector("[data-user-avatar]");
-  const logoutButton = document.querySelector("[data-logout-button]");
+	const user = readStoredUser();
 
-  if (!userMenu || userMenu.dataset.userMenuReady === "true") {
-    return;
-  }
+	const guestLinks = document.querySelectorAll("[data-guest-link]");
+	const userMenu = document.querySelector("[data-user-menu]");
+	const userMenuButton = document.querySelector("[data-user-menu-button]");
+	const userMenuPanel = document.querySelector("[data-user-menu-panel]");
+	const userName = document.querySelector("[data-user-name]");
+	const userAvatar = document.querySelector("[data-user-avatar]");
+	const logoutButton = document.querySelector("[data-logout-button]");
 
-  userMenu.dataset.userMenuReady = "true";
+	if (!userMenu) {
+		return;
+	}
 
-  if (user) {
-    guestLinks.forEach((link) => {
-      link.hidden = true;
-    });
+	// Actualizar SIEMPRE el estado visual
+	if (user) {
+		guestLinks.forEach((link) => {
+			link.hidden = true;
+		});
 
-    userMenu.hidden = false;
+		userMenu.hidden = false;
 
-    if (userName) {
-      userName.textContent = user.name || user.username || "Mi cuenta";
-    }
+		if (userName) {
+			userName.textContent =
+				user.name ||
+				user.username ||
+				"Mi cuenta";
+		}
 
-    if (userAvatar) {
-      userAvatar.textContent = user.avatarSymbol || (user.name || user.username || "U").trim().charAt(0).toUpperCase();
-      userAvatar.dataset.avatarStyle = user.avatarStyle || "berry";
-    }
-  }
+		if (userAvatar) {
+			userAvatar.textContent =
+				user.avatarSymbol ||
+				(user.name || user.username || "U")
+					.trim()
+					.charAt(0)
+					.toUpperCase();
 
-  userMenuButton?.addEventListener("click", () => {
-    const isOpen = userMenuButton.getAttribute("aria-expanded") === "true";
+			userAvatar.dataset.avatarStyle =
+				user.avatarStyle || "berry";
+		}
+	} else {
+		guestLinks.forEach((link) => {
+			link.hidden = false;
+		});
 
-    userMenuButton.setAttribute("aria-expanded", String(!isOpen));
+		userMenu.hidden = true;
 
-    if (userMenuPanel) {
-      userMenuPanel.hidden = isOpen;
-    }
-  });
+		closeUserMenu(userMenuButton, userMenuPanel);
+	}
 
-  document.addEventListener("click", (event) => {
-    if (userMenu.hidden || userMenu.contains(event.target)) {
-      return;
-    }
+	// Evitar registrar listeners varias veces
+	if (userMenu.dataset.userMenuReady === "true") {
+		return;
+	}
 
-    closeUserMenu(userMenuButton, userMenuPanel);
-  });
+	userMenu.dataset.userMenuReady = "true";
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") {
-      return;
-    }
+	userMenuButton?.addEventListener("click", () => {
+		const isOpen =
+			userMenuButton.getAttribute("aria-expanded") === "true";
 
-    closeUserMenu(userMenuButton, userMenuPanel);
-  });
+		userMenuButton.setAttribute(
+			"aria-expanded",
+			String(!isOpen)
+		);
 
-  logoutButton?.addEventListener("click", async () => {
-    localStorage.removeItem(USER_STORAGE_KEY);
-    await fetch("/api/logout", { method: "POST" }).catch(() => {});
-    window.location.href = "/";
-  });
+		if (userMenuPanel) {
+			userMenuPanel.hidden = isOpen;
+		}
+	});
+
+	document.addEventListener("click", (event) => {
+		if (
+			userMenu.hidden ||
+			userMenu.contains(event.target)
+		) {
+			return;
+		}
+
+		closeUserMenu(userMenuButton, userMenuPanel);
+	});
+
+	document.addEventListener("keydown", (event) => {
+		if (event.key !== "Escape") {
+			return;
+		}
+
+		closeUserMenu(userMenuButton, userMenuPanel);
+	});
+
+	logoutButton?.addEventListener("click", async () => {
+		localStorage.removeItem(USER_STORAGE_KEY);
+
+		await fetch("/api/logout", {
+			method: "POST",
+		}).catch(() => {});
+
+		window.location.href = "/";
+	});
+
+  
 }

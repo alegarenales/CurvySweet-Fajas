@@ -1,40 +1,62 @@
 ---
 import UserMenu from './UserMenu.astro';
 import './CSS/Welcome.css';
+
+const { showCart = false } = Astro.props;
 ---
 
 <div id="bar-menu">
-    <nav>
-        <a id="logo" href=".">CurvySweet</a>
-        <div class="nav">
-            <a href=".">Home</a>
-            <a href="/shop">Tienda</a>
-            <a href="/login" data-guest-link>Iniciar Sesion</a>
-            <a href="/register" data-guest-link>Registrarse</a>
-            <UserMenu />
-            <button id="theme-toggle" type="button">Modo oscuro</button>
-        </div>
-    </nav>
+	<nav>
+		<a id="logo" href="/">CurvySweet</a>
 
-    <button id="menu-toggle-btn" type="button" aria-label="Expandir/Minimizar menú">
-        <span class="menu-toggle-icon"></span>
-    </button>
+		<div class="nav">
+			<a href="/">Home</a>
+			<a href="/shop">Tienda</a>
+			<a href="/login" data-guest-link>Iniciar Sesion</a>
+			<a href="/register" data-guest-link>Registrarse</a>
+
+			{
+				showCart && (
+					<button
+						class="cart-nav-button"
+						type="button"
+						data-cart-open
+						aria-label="Abrir carrito"
+					>
+						<span class="cart-nav-icon" aria-hidden="true">
+							Cart
+						</span>
+
+						<span class="cart-nav-count" data-cart-count>
+							0
+						</span>
+					</button>
+				)
+			}
+
+			<UserMenu />
+
+			<button id="theme-toggle" type="button">
+				Modo oscuro
+			</button>
+		</div>
+	</nav>
+
+	<button
+		id="menu-toggle-btn"
+		type="button"
+		aria-label="Expandir/Minimizar menú"
+	>
+		<span class="menu-toggle-icon"></span>
+	</button>
 </div>
 
 <script>
-    import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
-    import { initThemeToggle } from '../scripts/theme-toggle.js';
-    import { initMenuToggle } from '../scripts/menu-toggle.js';
+	import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
+	import { initThemeToggle } from '../scripts/theme-toggle.js';
+	import { initMenuToggle } from '../scripts/menu-toggle.js';
 
-    document.addEventListener('astro:page-load', () => {
-        initBarMenuScroll();
-        initThemeToggle();
-        initMenuToggle();
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        initBarMenuScroll();
-        initThemeToggle();
-        initMenuToggle();
-    });
+	initBarMenuScroll();
+	initThemeToggle();
+	initMenuToggle();
 </script>
