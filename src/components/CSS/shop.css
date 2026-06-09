@@ -542,16 +542,18 @@ body {
 		transition: all 300ms ease;
 	}
 
-	#menu-toggle-btn {
-		display: none;
-		border: 0;
-		background: transparent;
-		cursor: pointer;
-		padding: 8px;
-		position: relative;
-		width: 24px;
-		height: 24px;
-	}
+    #menu-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        padding: 8px;
+        position: relative;
+        width: 24px;
+        height: 24px;
+    }
 
 	#bar-menu.menu-collapsed {
 		width: 48px;
