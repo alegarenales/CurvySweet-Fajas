@@ -7,7 +7,7 @@ const config: sql.config = {
   server: import.meta.env.DB_SERVER,
   database: import.meta.env.DB_NAME,
   options: {
-    encrypt: true,
+    encrypt: false,
     trustServerCertificate: false,
   },
   connectionTimeout: 30000,
