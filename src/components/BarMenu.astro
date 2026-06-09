@@ -26,7 +26,15 @@ import './CSS/Welcome.css';
     import { initThemeToggle } from '../scripts/theme-toggle.js';
     import { initMenuToggle } from '../scripts/menu-toggle.js';
 
-    initBarMenuScroll();
-    initThemeToggle();
-    initMenuToggle();
+    document.addEventListener('astro:page-load', () => {
+        initBarMenuScroll();
+        initThemeToggle();
+        initMenuToggle();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initBarMenuScroll();
+        initThemeToggle();
+        initMenuToggle();
+    });
 </script>
