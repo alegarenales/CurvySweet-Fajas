@@ -20,6 +20,19 @@
 	--shadow-soft: 0 24px 70px rgba(154, 73, 116, 0.16);
 }
 
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	width: 100%;
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
 :root.theme-dark {
 	--page-bg: #17121d;
 	--page-bg-alt: #24141d;
@@ -42,7 +55,7 @@
 	--shadow-soft: 0 30px 80px rgba(0, 0, 0, 0.42);
 }
 
-html,
+/* html,
 body {
 	margin: 0;
 	background:
@@ -55,6 +68,22 @@ body {
 
 body {
 	overflow-x: hidden;
+} */
+
+html,
+body {
+	margin: 0;
+	width: 100%;
+	max-width: 100%;
+	overflow-x: hidden;
+
+	background:
+		radial-gradient(circle at top left, rgba(255, 199, 221, 0.85), transparent 28%),
+		radial-gradient(circle at 85% 18%, rgba(255, 223, 205, 0.9), transparent 26%),
+		linear-gradient(135deg, var(--page-bg), var(--page-bg-alt));
+
+	color: var(--text-main);
+	font-family: "Segoe UI", sans-serif;
 }
 
 #bar-menu {
@@ -708,9 +737,23 @@ body {
 		align-items: center;
 		justify-content: center;
 	}
-
+/* 
 	#bar-menu:not(.menu-collapsed) {
 		width: calc(100% - 16px);
+	} */
+	#bar-menu:not(.menu-collapsed) {
+		width: 100%;
+	max-width: calc(100vw - 16px);
+	}
+	.welcome-hero,
+	.welcome-grid,
+	.welcome-copy,
+	.welcome-visual,
+	.welcome-stats,
+	.stat-card,
+	.hero-card {
+		max-width: 100%;
+		overflow-x: hidden;
 	}
 
 	#bar-menu:not(.menu-collapsed) nav {
