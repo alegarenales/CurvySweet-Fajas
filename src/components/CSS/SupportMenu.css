@@ -127,3 +127,53 @@
 	}
 
 }
+.support-social.mail {
+	background: #ffffff;
+	border: 1px solid #e5e5e5;
+}
+
+.support-social.mail img {
+	width: 24px;
+	height: 24px;
+}
+
+.support-social.whatsapp {
+	background: linear-gradient(
+		135deg,
+		#25D366,
+		#128C7E
+	);
+
+	border: none;
+}
+
+.support-social.instagram {
+	background: linear-gradient(
+		45deg,
+		#F58529,
+		#FEDA77,
+		#DD2A7B,
+		#8134AF,
+		#515BD4
+	);
+
+	border: none;
+}
+
+.support-social.instagram img {
+	filter: brightness(0) invert(1);
+}
+
+.support-social.tiktok {
+	background: linear-gradient(
+		135deg,
+		#000000,
+		#2B2B2B
+	);
+
+	border: none;
+}
+
+.support-social.tiktok img {
+	filter: brightness(0) invert(1);
+}
