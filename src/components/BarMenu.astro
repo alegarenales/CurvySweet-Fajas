@@ -1,5 +1,6 @@
 ---
 import UserMenu from './UserMenu.astro';
+import SupportMenu from './SupportMenu.astro';
 import './CSS/Welcome.css';
 
 const { showCart = false } = Astro.props;
@@ -33,7 +34,7 @@ const { showCart = false } = Astro.props;
 					</button>
 				)
 			}
-
+			<SupportMenu />
 			<UserMenu />
 
 			<button id="theme-toggle" type="button">

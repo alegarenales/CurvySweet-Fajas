@@ -1,0 +1,67 @@
+---
+import "./CSS/SupportMenu.css";
+---
+
+<div class="support-menu" data-support-menu>
+	<button
+		class="support-menu-button"
+		type="button"
+		data-support-menu-button
+		aria-expanded="false"
+	>
+		<span class="support-icon">💬</span>
+		<span>Soporte</span>
+	</button>
+
+	<div class="support-menu-panel" data-support-menu-panel hidden>
+		<h3>¿Necesitas ayuda?</h3>
+
+		<p>
+			Estamos aquí para ayudarte.<br />
+			Escríbenos por el medio que prefieras.
+		</p>
+
+		<div class="support-socials">
+			<a
+				href="mailto:curvysweet.fajas@gmail.com"
+				class="support-social"
+				title="Correo"
+			>
+				📧
+			</a>
+
+			<a
+				href="https://wa.me/34600000000"
+				target="_blank"
+				class="support-social"
+				title="WhatsApp"
+			>
+				💬
+			</a>
+
+			<a
+				href="https://www.instagram.com/curvysweet.fajas/"
+				target="_blank"
+				class="support-social"
+				title="Instagram"
+			>
+				📷
+			</a>
+
+			<a
+				href="https://www.tiktok.com/@curvysweet.fajas"
+				target="_blank"
+				class="support-social"
+				title="TikTok"
+			>
+				🎵
+			</a>
+		</div>
+	</div>
+</div>
+
+<script>
+	import { initSupportMenu } from "../scripts/support-menu.js";
+
+	initSupportMenu();
+</script>
