@@ -126,6 +126,12 @@ const products = getProducts();
 const imageRotators = new WeakMap();
 
 window.handleProductCardClick = (event) => {
+    // Si se ha pulsado un botón o elemento del carrito,
+    // no abrir la página del producto.
+    if (event.target.closest('[data-cart-add]')) {
+        return;
+    }
+
     const productLink = event.currentTarget.dataset.productLink;
 
     if (productLink) {
