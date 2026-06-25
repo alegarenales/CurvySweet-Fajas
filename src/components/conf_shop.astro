@@ -42,6 +42,7 @@ const products = getProducts();
 					class="product-card"
 					role={product.link ? 'link' : undefined}
 					tabindex={product.link ? '0' : undefined}
+					data-product-id={product.id}
 					data-product-link={product.link ?? ''}
 					onclick="handleProductCardClick(event)"
 					onkeydown="handleProductCardKeydown(event)"

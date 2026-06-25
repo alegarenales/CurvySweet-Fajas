@@ -3,6 +3,7 @@ import '../../../src/components/CSS/faja_chaleco_cinturilla.css';
 import UserMenu from '../../components/UserMenu.astro';
 import CartDrawer from '../../components/CartDrawer.astro';
 import { getProductPageById, getRelatedProducts } from '../../lib/product_info';
+import BarMenu from '../../components/BarMenu.astro';
 
 const product = getProductPageById('faja_latex');
 
@@ -19,31 +20,12 @@ const secondaryImages = product.gallery.slice(1);
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/x-icon" href="/curvysweet.ico" />
 		<title>{product.name} | CurvySweet</title>
 	</head>
 	<body>
+		<BarMenu showCart={true} />
 		<div class="product-page">
-			<!-- <div id="bar-menu">
-				<nav>
-					<a id="logo" href="/">CurvySweet</a>
-					<div class="nav">
-						<a href="/">Home</a>
-						<a href="/shop">Tienda</a>
-						<a href="/login" data-guest-link>Iniciar Sesion</a>
-						<a href="/register" data-guest-link>Registrarse</a>
-						<button class="cart-nav-button" type="button" data-cart-open aria-label="Abrir carrito">
-							<span class="cart-nav-icon" aria-hidden="true">Cart</span>
-							<span class="cart-nav-count" data-cart-count>0</span>
-						</button>
-						<UserMenu />
-						<button id="theme-toggle" type="button">Modo oscuro</button>
-					</div>
-				</nav>
-				<button id="menu-toggle-btn" type="button" aria-label="Expandir/Minimizar menú">
-					<span class="menu-toggle-icon"></span>
-				</button>
-			</div> -->
-
 			<main class="product-detail">
 				<section class="product-hero">
 					<div class="product-gallery">
@@ -196,6 +178,42 @@ const secondaryImages = product.gallery.slice(1);
 					</section>
 				)}
 
+				<section class="product-reviews customer-reviews" data-product-reviews={product.id}>
+					<div class="section-heading">
+						<p class="section-kicker">Comentarios</p>
+						<h2>Cuenta tu experiencia</h2>
+					</div>
+
+					<form class="review-form" data-review-form>
+						<label>
+							<span>Nombre</span>
+							<input name="name" maxlength="60" placeholder="Tu nombre" autocomplete="name" />
+						</label>
+
+						<fieldset class="rating-field">
+							<legend>Puntuacion</legend>
+							<div class="rating-options">
+								{[5, 4, 3, 2, 1].map((rating) => (
+									<label>
+										<input type="radio" name="rating" value={rating} checked={rating === 5} required />
+										<span>{String.fromCharCode(9733).repeat(rating)}</span>
+									</label>
+								))}
+							</div>
+						</fieldset>
+
+						<label class="review-comment-field">
+							<span>Comentario</span>
+							<textarea name="comment" minlength="8" maxlength="600" rows="4" placeholder="Que te ha parecido este producto?" required></textarea>
+						</label>
+
+						<button class="primary-button" type="submit">Publicar comentario</button>
+						<p class="review-status" data-review-status aria-live="polite"></p>
+					</form>
+
+					<div class="review-grid user-review-grid" data-user-review-list></div>
+				</section>
+
 				{product.faqs.length > 0 && (
 					<section class="product-faqs">
 						<div class="section-heading">
@@ -255,9 +273,13 @@ const secondaryImages = product.gallery.slice(1);
 <script>
 	import { initThemeToggle } from '../../scripts/theme-toggle.js';
 	import { initMenuToggle } from '../../scripts/menu-toggle.js';
+	import { initProductReviews } from '../../scripts/product-reviews.js';
+	import { initBarMenuScroll } from '../../scripts/bar-menu-scroll.js';
 
+	initBarMenuScroll();
 	initThemeToggle();
 	initMenuToggle();
+	initProductReviews();
 
 	document.querySelectorAll('[data-option-group]').forEach((group) => {
 		const buttons = group.querySelectorAll('[data-option-button]');

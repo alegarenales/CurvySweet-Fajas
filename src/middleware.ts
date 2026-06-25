@@ -2,7 +2,7 @@ import { defineMiddleware } from "astro:middleware";
 import { getAdminSession } from "./lib/admin";
 import { readAdminState } from "./lib/admin-state";
 
-const bypassPrefixes = ["/api", "/_astro", "/favicon"];
+const bypassPrefixes = ["/api", "/_astro", "/favicon", "/curvysweet.ico"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const pathname = new URL(context.request.url).pathname;
@@ -21,6 +21,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/x-icon" href="/curvysweet.ico" />
         <title>CurvySweet en mantenimiento</title>
         <style>
           body {

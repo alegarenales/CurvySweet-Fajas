@@ -1,5 +1,4 @@
 ---
-import background from '../assets/background.svg';
 import './CSS/ShopSection.css';
 import { getProducts } from '../lib/catalog';
 
@@ -70,7 +69,7 @@ const slides = (products.length ? products.slice(0, 3) : [ /* fallback */ ])
 								<p>{slide.description}</p>
 								<div class="shop-slide-meta">
 									<strong data-product-price={slide.id}>{slide.displayPrice}</strong>
-									<a class="shop-slide-link" href="/shop">
+									<a class="shop-slide-link" href={slide.link ?? '/shop'}>
 										Ver tienda
 									</a>
 								</div>
@@ -78,7 +77,7 @@ const slides = (products.length ? products.slice(0, 3) : [ /* fallback */ ])
 
 							<div class="shop-slide-visual" aria-hidden="true">
 								<div class="shop-slide-card">
-									<img src={background.src} alt="" loading="lazy" />
+									<img src={slide.image} alt="" loading="lazy" />
 									<div class="shop-slide-orb shop-slide-orb-one"></div>
 									<div class="shop-slide-orb shop-slide-orb-two"></div>
 									<div class="shop-slide-label">

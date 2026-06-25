@@ -316,8 +316,7 @@ body {
 }
 
 .welcome-lead,
-.stat-card p,
-.mini-feature span {
+.stat-card p {
 	color: var(--text-soft);
 }
 
@@ -624,19 +623,22 @@ body {
 	background: var(--surface-strong);
 }
 
-.mini-feature {
-	display: grid;
-	gap: 6px;
-	padding: 16px 0;
-	border-top: 1px solid rgba(255, 255, 255, 0.34);
+.hero-image-card {
+	aspect-ratio: 4 / 5;
+	padding: 12px;
+	overflow: hidden;
+	background:
+		radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.72), transparent 30%),
+		linear-gradient(145deg, rgba(255, 209, 229, 0.9), rgba(255, 245, 250, 0.92));
 }
 
-.mini-feature:first-of-type {
-	margin-top: 10px;
-}
-
-.mini-feature strong {
-	font-size: 1.02rem;
+.hero-image-card img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 24px;
+	box-shadow: 0 18px 40px rgba(105, 36, 78, 0.16);
 }
 
 .welcome-glow {
