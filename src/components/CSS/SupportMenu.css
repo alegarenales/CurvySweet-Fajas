@@ -176,14 +176,6 @@
 	filter: none !important;
 }
 
-html.theme-dark .support-social img {
-	filter: brightness(0) invert(1);
-}
-
-html:not(.theme-dark) .support-social img {
-	filter: none;
-}
-
 html.theme-dark .support-social:not(.mail) img {
 	filter: brightness(0) invert(1);
 }
