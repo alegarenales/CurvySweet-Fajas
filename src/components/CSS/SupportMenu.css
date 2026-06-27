@@ -160,10 +160,6 @@
 	border: none;
 }
 
-.support-social.instagram img {
-	filter: brightness(0) invert(1);
-}
-
 .support-social.tiktok {
 	background: linear-gradient(
 		135deg,
@@ -174,6 +170,8 @@
 	border: none;
 }
 
-.support-social.tiktok img {
-	filter: brightness(0) invert(1);
+.support-social img {
+	width: 24px;
+	height: 24px;
+	filter: none !important;
 }
