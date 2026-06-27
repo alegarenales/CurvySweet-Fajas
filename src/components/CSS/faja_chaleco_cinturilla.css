@@ -599,9 +599,10 @@ body {
 
 .rating-options {
 	display: flex;
+	flex-wrap: wrap;
 	flex-direction: row-reverse;
-	justify-content: flex-end;
-	gap: 6px;
+	justify-content: center;
+	gap: 8px;
 }
 
 .rating-options label {
@@ -650,7 +651,8 @@ body {
 }
 
 .review-form .primary-button {
-	justify-self: start;
+	width: 100%;
+	justify-self: stretch;
 }
 
 .review-status {
@@ -873,6 +875,21 @@ body {
 	.related-grid,
 	.faq-list {
 		grid-template-columns: 1fr;
+	}
+
+	.review-form {
+		grid-template-columns: 1fr;
+	}
+
+	.review-comment-field {
+		grid-column: auto;
+	}
+
+	.rating-options span {
+		min-inline-size: 40px;
+		block-size: 36px;
+		padding: 0 8px;
+		font-size: .9rem;
 	}
 }
 
