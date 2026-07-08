@@ -28,27 +28,31 @@ const secondaryImages = product.gallery.slice(1);
 		<div class="product-page">
 			<main class="product-detail">
 				<section class="product-hero">
-					<div class="product-gallery">
+					<div class="product-gallery" data-product-gallery data-gallery-images={product.gallery.join('|')}>
 						<div class="product-main-image">
-							<div
+							<button
+								type="button"
 								class="product-image-frame"
-								role="img"
 								aria-label={product.name}
 								data-product-image={product.id}
+								data-gallery-main
+								data-gallery-open
 								style={`background-image: url('${primaryImage}');`}
-							></div>
+							></button>
 						</div>
 
 						{secondaryImages.length > 0 && (
 							<div class="product-thumb-grid">
 								{
 									secondaryImages.map((image, index) => (
-										<div
+										<button
+											type="button"
 											class="product-thumb"
-											role="img"
 											aria-label={`${product.name} vista ${index + 2}`}
+											data-gallery-thumb
+											data-gallery-index={index + 1}
 											style={`background-image: url('${image}');`}
-										></div>
+										></button>
 									))
 								}
 							</div>
@@ -266,6 +270,22 @@ const secondaryImages = product.gallery.slice(1);
 				)}
 			</main>
 		</div>
+		<div class="product-lightbox" data-product-lightbox hidden>
+			<div class="product-lightbox-backdrop" data-lightbox-close></div>
+			<div class="product-lightbox-dialog" role="dialog" aria-modal="true" aria-label={`Galeria de ${product.name}`}>
+				<button class="lightbox-close" type="button" data-lightbox-close aria-label="Cerrar visor">x</button>
+				<button class="lightbox-nav lightbox-prev" type="button" data-lightbox-prev aria-label="Imagen anterior">‹</button>
+				<div class="lightbox-stage">
+					<img src={primaryImage} alt={product.name} data-lightbox-image />
+				</div>
+				<button class="lightbox-nav lightbox-next" type="button" data-lightbox-next aria-label="Imagen siguiente">›</button>
+				<div class="lightbox-controls" aria-label="Controles de zoom">
+					<button type="button" data-lightbox-zoom-out aria-label="Disminuir imagen">-</button>
+					<span data-lightbox-zoom>100%</span>
+					<button type="button" data-lightbox-zoom-in aria-label="Ampliar imagen">+</button>
+				</div>
+			</div>
+		</div>
 		<CartDrawer />
 	</body>
 </html>
@@ -275,11 +295,13 @@ const secondaryImages = product.gallery.slice(1);
 	import { initMenuToggle } from '../../scripts/menu-toggle.js';
 	import { initProductReviews } from '../../scripts/product-reviews.js';
 	import { initBarMenuScroll } from '../../scripts/bar-menu-scroll.js';
+	import { initProductGallery } from '../../scripts/product-gallery.js';
 
 	initBarMenuScroll();
 	initThemeToggle();
 	initMenuToggle();
 	initProductReviews();
+	initProductGallery();
 
 	document.querySelectorAll('[data-option-group]').forEach((group) => {
 		const buttons = group.querySelectorAll('[data-option-button]');
