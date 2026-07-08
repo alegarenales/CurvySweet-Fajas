@@ -104,12 +104,37 @@ function syncCatalogInputs(panel, catalogDrafts) {
     const priceInput = panel.querySelector(`[data-admin-price-input="${productId}"]`);
     const imageInput = panel.querySelector(`[data-admin-image-input="${productId}"]`);
     const stockInput = panel.querySelector(`[data-admin-stock-input="${productId}"]`);
+    const imagePreview = panel.querySelector(`[data-admin-image-preview="${productId}"]`);
 
     if (nameInput && productDraft.name) nameInput.value = productDraft.name;
     if (priceInput && productDraft.price) priceInput.value = productDraft.price;
-    if (imageInput && productDraft.image) imageInput.value = productDraft.image;
-    if (stockInput && productDraft.stock) stockInput.value = productDraft.stock;
+    if (imageInput && productDraft.image) {
+      imageInput.value = productDraft.image;
+      if (imagePreview) {
+        imagePreview.style.backgroundImage = `url('${productDraft.image}')`;
+      }
+    }
+    if (stockInput && productDraft.stock) {
+      setStockToggleState(panel, productId, productDraft.stock);
+    }
   });
+}
+
+function setStockToggleState(panel, productId, stock) {
+  const nextStock = stock === "out" ? "out" : "in";
+  const inStock = nextStock === "in";
+  const input = panel.querySelector(`[data-admin-stock-input="${productId}"]`);
+  const button = panel.querySelector(`[data-admin-stock-toggle="${productId}"]`);
+
+  if (input) {
+    input.value = nextStock;
+  }
+
+  if (button) {
+    button.dataset.stockState = nextStock;
+    button.textContent = inStock ? "En stock" : "Sin stock";
+    button.setAttribute("aria-pressed", String(inStock));
+  }
 }
 
 function renderDrafts(panel, drafts) {
@@ -281,6 +306,26 @@ export function initAdminPanel() {
 
       if (target === "users") {
         loadUsers(panel).catch((error) => setStatus(panel, error.message));
+      }
+    });
+  });
+
+  panel.querySelectorAll("[data-admin-stock-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = button.dataset.adminStockToggle;
+      const nextStock = button.dataset.stockState === "in" ? "out" : "in";
+
+      setStockToggleState(panel, productId, nextStock);
+    });
+  });
+
+  panel.querySelectorAll("[data-admin-image-input]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const productId = input.dataset.adminImageInput;
+      const preview = panel.querySelector(`[data-admin-image-preview="${productId}"]`);
+
+      if (preview) {
+        preview.style.backgroundImage = input.value.trim() ? `url('${input.value.trim()}')` : "none";
       }
     });
   });

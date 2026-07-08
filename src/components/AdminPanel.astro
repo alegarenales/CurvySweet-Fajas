@@ -44,46 +44,65 @@ const { adminEmail } = Astro.props;
         <form class="admin-product-form" data-admin-product-form>
           {
             products.map((product) => (
-              <fieldset class="admin-product-row">
+              <fieldset class="admin-product-row" data-admin-product-row={product.id}>
                 <legend>{product.name}</legend>
-                <label>
-                  <span>Nombre</span>
-                  <input
-                    type="text"
-                    name={`${product.id}:name`}
-                    value={product.name}
-                    data-admin-name-input={product.id}
-                  />
-                </label>
-                <label>
-                  <span>Precio</span>
-                  <input
-                    type="text"
-                    name={`${product.id}:price`}
-                    value={product.displayPrice}
-                    data-admin-price-input={product.id}
-                  />
-                </label>
-                <label class="admin-product-image-field">
-                  <span>Imagen</span>
-                  <input
-                    type="text"
-                    name={`${product.id}:image`}
-                    value={product.image}
-                    data-admin-image-input={product.id}
-                  />
-                </label>
-                <label>
-                  <span>Estado</span>
-                  <select name={`${product.id}:stock`} data-admin-stock-input={product.id}>
-                    <option value="in" selected={product.inStock}>En stock</option>
-                    <option value="out" selected={!product.inStock}>Sin stock</option>
-                  </select>
-                </label>
+                <div
+                  class="admin-product-preview"
+                  data-admin-image-preview={product.id}
+                  style={`background-image: url('${product.image}');`}
+                  aria-hidden="true"
+                ></div>
+                <div class="admin-product-fields">
+                  <label>
+                    <span>Nombre</span>
+                    <input
+                      type="text"
+                      name={`${product.id}:name`}
+                      value={product.name}
+                      data-admin-name-input={product.id}
+                    />
+                  </label>
+                  <label>
+                    <span>Precio</span>
+                    <input
+                      type="text"
+                      name={`${product.id}:price`}
+                      value={product.displayPrice}
+                      data-admin-price-input={product.id}
+                    />
+                  </label>
+                  <label class="admin-product-image-field">
+                    <span>Imagen</span>
+                    <input
+                      type="text"
+                      name={`${product.id}:image`}
+                      value={product.image}
+                      data-admin-image-input={product.id}
+                    />
+                  </label>
+                  <label>
+                    <span>Estado</span>
+                    <input
+                      type="hidden"
+                      name={`${product.id}:stock`}
+                      value={product.inStock ? "in" : "out"}
+                      data-admin-stock-input={product.id}
+                    />
+                    <button
+                      type="button"
+                      class="admin-stock-toggle"
+                      data-admin-stock-toggle={product.id}
+                      data-stock-state={product.inStock ? "in" : "out"}
+                      aria-pressed={product.inStock ? "true" : "false"}
+                    >
+                      {product.inStock ? "En stock" : "Sin stock"}
+                    </button>
+                  </label>
+                </div>
               </fieldset>
             ))
           }
-          <button type="submit" class="admin-primary-button">Publicar cambios</button>
+          <button type="submit" class="admin-primary-button admin-publish-button">Publicar cambios</button>
         </form>
       </section>
 
