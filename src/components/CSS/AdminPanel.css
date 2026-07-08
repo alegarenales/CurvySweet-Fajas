@@ -1,22 +1,24 @@
 .admin-panel {
-  --admin-panel-bg: #0b0b0b;
-  --admin-panel-surface: #171717;
-  --admin-panel-surface-soft: #222;
-  --admin-panel-border: rgba(255, 255, 255, 0.16);
+  --admin-panel-bg: rgba(22, 14, 29, 0.58);
+  --admin-panel-surface: rgba(255, 255, 255, 0.13);
+  --admin-panel-surface-soft: rgba(255, 255, 255, 0.1);
+  --admin-panel-border: rgba(255, 255, 255, 0.26);
   --admin-panel-text: #fff;
-  --admin-panel-muted: #c7c7c7;
-  --admin-red: #ef4444;
-  --admin-green: #22c55e;
-  --admin-orange: #f97316;
+  --admin-panel-muted: rgba(255, 244, 252, 0.74);
+  --admin-red: #ff5570;
+  --admin-green: #4ee7a0;
+  --admin-orange: #ffb45f;
+  --admin-pink: #ff7ac4;
   position: fixed;
   left: 14px;
   right: 14px;
   bottom: 0;
-  z-index: 9999;
+  z-index: 2147483000;
   color: var(--admin-panel-text);
   transform: translateY(calc(100% - 46px));
-  transition: transform 220ms ease;
-  font-family: Arial, sans-serif;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
 }
 
 .admin-panel:hover,
@@ -34,9 +36,12 @@
   align-items: center;
   border: 1px solid var(--admin-panel-border);
   border-bottom: 0;
-  border-radius: 8px 8px 0 0;
-  background: var(--admin-panel-bg);
-  box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.24);
+  border-radius: 18px 18px 0 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08)),
+    var(--admin-panel-bg);
+  box-shadow: 0 -12px 40px rgba(84, 22, 68, 0.22);
+  backdrop-filter: blur(22px) saturate(1.2);
   font-size: 0.86rem;
   font-weight: 800;
 }
@@ -45,9 +50,14 @@
   max-height: min(78vh, 620px);
   overflow: auto;
   border: 1px solid var(--admin-panel-border);
-  border-radius: 8px 0 0 0;
-  background: var(--admin-panel-bg);
-  box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.42);
+  border-radius: 24px 0 0 0;
+  background:
+    radial-gradient(circle at 16% 8%, rgba(255, 122, 196, 0.26), transparent 34%),
+    radial-gradient(circle at 90% 18%, rgba(109, 239, 211, 0.18), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.07)),
+    var(--admin-panel-bg);
+  box-shadow: 0 -24px 80px rgba(42, 9, 38, 0.42);
+  backdrop-filter: blur(28px) saturate(1.35);
 }
 
 .admin-panel-header,
@@ -62,6 +72,7 @@
   justify-content: space-between;
   padding: 16px 18px;
   border-bottom: 1px solid var(--admin-panel-border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
 }
 
 .admin-panel-header p,
@@ -94,17 +105,30 @@
 .admin-primary-button,
 .admin-tool-actions a {
   border: 1px solid var(--admin-panel-border);
-  border-radius: 6px;
+  border-radius: 999px;
   padding: 9px 12px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--admin-panel-text);
   font-weight: 800;
   cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.admin-panel-tabs button:hover,
+.admin-tool button:hover,
+.admin-tool-actions a:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .admin-panel-tabs button.is-active {
-  background: #fff;
-  color: #000;
+  background: linear-gradient(135deg, rgba(255, 122, 196, 0.92), rgba(255, 180, 95, 0.9));
+  color: #24091b;
+  border-color: rgba(255, 255, 255, 0.36);
 }
 
 .admin-panel a {
@@ -125,9 +149,15 @@
 
 .admin-tool {
   border: 1px solid var(--admin-panel-border);
-  border-radius: 8px;
+  border-radius: 22px;
   padding: 14px;
-  background: var(--admin-panel-surface);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+    var(--admin-panel-surface);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 18px 48px rgba(42, 9, 38, 0.18);
+  backdrop-filter: blur(18px);
 }
 
 .admin-tool-wide {
@@ -153,7 +183,7 @@
 }
 
 .admin-product-form {
-  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
 }
 
 .admin-product-row {
@@ -161,9 +191,13 @@
   grid-template-columns: minmax(0, 1fr) 110px;
   gap: 10px;
   border: 1px solid var(--admin-panel-border);
-  border-radius: 8px;
+  border-radius: 18px;
   padding: 12px;
   background: var(--admin-panel-surface-soft);
+}
+
+.admin-product-image-field {
+  grid-column: 1 / -1;
 }
 
 .admin-product-row legend {
@@ -181,21 +215,23 @@
   width: 100%;
   box-sizing: border-box;
   border: 1px solid var(--admin-panel-border);
-  border-radius: 6px;
+  border-radius: 14px;
   padding: 9px 10px;
   color: var(--admin-panel-text);
-  background: #050505;
+  background: rgba(11, 6, 18, 0.46);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .admin-panel input:focus,
 .admin-panel select:focus {
-  outline: 2px solid var(--admin-orange);
+  outline: 2px solid var(--admin-pink);
   outline-offset: 1px;
 }
 
 .admin-primary-button {
-  background: var(--admin-orange);
-  border-color: var(--admin-orange);
+  background: linear-gradient(135deg, var(--admin-pink), var(--admin-orange));
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #250817;
 }
 
 .admin-chart-grid {
@@ -209,10 +245,11 @@
   display: grid;
   gap: 12px;
   border: 1px solid var(--admin-panel-border);
-  border-radius: 8px;
+  border-radius: 18px;
   padding: 14px;
-  background: #fff;
-  color: #111;
+  background: rgba(255, 255, 255, 0.82);
+  color: #251426;
+  backdrop-filter: blur(18px);
 }
 
 .admin-bar-list {
@@ -274,7 +311,7 @@
 .admin-user-item,
 .admin-draft {
   border: 1px solid var(--admin-panel-border);
-  border-radius: 6px;
+  border-radius: 16px;
   padding: 10px;
   background: var(--admin-panel-surface-soft);
 }

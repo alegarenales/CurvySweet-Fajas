@@ -1,9 +1,12 @@
 ---
 import UserMenu from './UserMenu.astro';
 import SupportMenu from './SupportMenu.astro';
+import AdminPanel from './AdminPanel.astro';
 import './CSS/Welcome.css';
+import { getAdminSession } from '../lib/admin';
 
 const { showCart = false } = Astro.props;
+const adminSession = getAdminSession(Astro.cookies);
 ---
 
 <div id="bar-menu">
@@ -51,6 +54,8 @@ const { showCart = false } = Astro.props;
 		<span class="menu-toggle-icon"></span>
 	</button>
 </div>
+
+{adminSession && <AdminPanel adminEmail={adminSession.email} />}
 
 <script>
 	import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';

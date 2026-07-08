@@ -64,10 +64,26 @@ const { adminEmail } = Astro.props;
                     data-admin-price-input={product.id}
                   />
                 </label>
+                <label class="admin-product-image-field">
+                  <span>Imagen</span>
+                  <input
+                    type="text"
+                    name={`${product.id}:image`}
+                    value={product.image}
+                    data-admin-image-input={product.id}
+                  />
+                </label>
+                <label>
+                  <span>Estado</span>
+                  <select name={`${product.id}:stock`} data-admin-stock-input={product.id}>
+                    <option value="in" selected={product.inStock}>En stock</option>
+                    <option value="out" selected={!product.inStock}>Sin stock</option>
+                  </select>
+                </label>
               </fieldset>
             ))
           }
-          <button type="submit" class="admin-primary-button">Guardar cambios visibles</button>
+          <button type="submit" class="admin-primary-button">Publicar cambios</button>
         </form>
       </section>
 
