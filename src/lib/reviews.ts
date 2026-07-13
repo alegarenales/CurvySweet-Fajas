@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { products } from "./catalog";
+import { ProductRepository } from "../repositories/ProductRepository";
 
 export type ProductReviewEntry = {
   id: string;
@@ -14,7 +14,7 @@ export type ProductReviewEntry = {
 export type ProductReviews = Record<string, ProductReviewEntry[]>;
 
 const reviewsPath = join(process.cwd(), ".curvysweet", "product-reviews.json");
-const productIds = new Set(products.map((product) => product.id));
+
 
 function cleanText(value: unknown, maxLength: number) {
   return String(value ?? "")
@@ -23,8 +23,12 @@ function cleanText(value: unknown, maxLength: number) {
     .slice(0, maxLength);
 }
 
-export function isValidProductId(productId: string) {
-  return productIds.has(productId);
+export async function isValidProductId(productId: string) {
+
+    const product = await ProductRepository.getProductById(productId);
+
+    return product !== null;
+
 }
 
 export function readProductReviews(): ProductReviews {
@@ -41,7 +45,6 @@ export function readProductReviews(): ProductReviews {
 
     return Object.fromEntries(
       Object.entries(parsed as ProductReviews)
-        .filter(([productId]) => isValidProductId(productId))
         .map(([productId, reviews]) => [
           productId,
           Array.isArray(reviews)
@@ -68,7 +71,7 @@ export function getReviewsForProduct(productId: string) {
   return readProductReviews()[productId] ?? [];
 }
 
-export function addProductReview(rawReview: {
+export async function addProductReview(rawReview: {
   productId: unknown;
   name: unknown;
   rating: unknown;
@@ -79,7 +82,7 @@ export function addProductReview(rawReview: {
   const rating = Math.min(5, Math.max(1, Number(rawReview.rating) || 0));
   const comment = cleanText(rawReview.comment, 600);
 
-  if (!isValidProductId(productId)) {
+  if (!(await isValidProductId(productId))) {
     throw new Error("Producto no valido.");
   }
 

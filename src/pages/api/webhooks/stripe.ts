@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { sendPurchaseEmail } from "../../../lib/mail";
 import Stripe from "stripe";
 
 const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
@@ -25,21 +26,42 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response("Firma invalida.", { status: 400 });
   }
 
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      console.log("Pago confirmado:", {
-        sessionId: session.id,
-        customerEmail: session.customer_details?.email ?? null,
-        amountTotal: session.amount_total ?? null,
-        currency: session.currency ?? null,
+switch (event.type) {
+
+  case "checkout.session.completed": {
+
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    console.log("Pago confirmado:", {
+      sessionId: session.id,
+      customerEmail: session.customer_details?.email ?? null,
+      amountTotal: session.amount_total ?? null,
+      currency: session.currency ?? null,
+    });
+
+    const email = session.customer_details?.email;
+
+    if (email) {
+      await sendPurchaseEmail({
+        to: email,
+        name: session.customer_details?.name ?? "Cliente",
+        products: [
+          {
+            name: "Tu pedido CurvySweet",
+            quantity: 1,
+            price: `${((session.amount_total ?? 0) / 100).toFixed(2)} €`,
+          },
+        ],
+        total: `${((session.amount_total ?? 0) / 100).toFixed(2)} €`,
       });
-      break;
     }
-    default:
-      console.log(`Evento Stripe ignorado: ${event.type}`);
-      break;
+
+    break;
   }
 
-  return new Response("ok", { status: 200 });
-};
+  default:
+    console.log(`Evento Stripe ignorado: ${event.type}`);
+    break;
+}
+
+return new Response("ok", { status: 200 })};

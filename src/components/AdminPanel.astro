@@ -1,9 +1,11 @@
 ---
-import { products } from "../lib/catalog";
+import { ProductRepository } from "../repositories/ProductRepository";
 import "./CSS/AdminPanel.css";
 
+const products = await ProductRepository.getProducts();
+
 type Props = {
-  adminEmail: string;
+    adminEmail: string;
 };
 
 const { adminEmail } = Astro.props;

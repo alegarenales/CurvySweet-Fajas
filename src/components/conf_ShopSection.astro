@@ -1,8 +1,8 @@
 ---
 import './CSS/ShopSection.css';
-import { getProducts } from '../lib/catalog';
 
-const products = getProducts();
+import { ProductRepository } from '../repositories/ProductRepository';
+const products = await ProductRepository.getProducts();
 
 const palette = [
 	{

@@ -1,4 +1,4 @@
-const CATALOG_STORAGE_KEY = "curvysweetAdminCatalogDrafts";
+// const CATALOG_STORAGE_KEY = "curvysweetAdminCatalogDrafts";
 const PRODUCT_STORAGE_KEY = "curvysweetAdminProductDrafts";
 const USER_STORAGE_KEY = "curvysweetUser";
 
@@ -22,66 +22,66 @@ function setStatus(panel, message) {
   }
 }
 
-function applyCatalogDrafts(catalogDrafts) {
-  Object.entries(catalogDrafts).forEach(([productId, productDraft]) => {
-    if (productDraft.price) {
-      document.querySelectorAll(`[data-product-price="${productId}"]`).forEach((priceElement) => {
-        priceElement.textContent = productDraft.price;
-      });
-    }
+// function applyCatalogDrafts(catalogDrafts) {
+//   Object.entries(catalogDrafts).forEach(([productId, productDraft]) => {
+//     if (productDraft.price) {
+//       document.querySelectorAll(`[data-product-price="${productId}"]`).forEach((priceElement) => {
+//         priceElement.textContent = productDraft.price;
+//       });
+//     }
 
-    if (productDraft.name) {
-      document.querySelectorAll(`[data-product-name="${productId}"]`).forEach((nameElement) => {
-        nameElement.textContent = productDraft.name;
-      });
-    }
+//     if (productDraft.name) {
+//       document.querySelectorAll(`[data-product-name="${productId}"]`).forEach((nameElement) => {
+//         nameElement.textContent = productDraft.name;
+//       });
+//     }
 
-    if (productDraft.image) {
-      document.querySelectorAll(`[data-product-image="${productId}"]`).forEach((imageElement) => {
-        if (imageElement instanceof HTMLImageElement) {
-          imageElement.src = productDraft.image;
-        } else {
-          imageElement.style.backgroundImage = `url('${productDraft.image}')`;
-        }
-      });
-    }
+//     if (productDraft.image) {
+//       document.querySelectorAll(`[data-product-image="${productId}"]`).forEach((imageElement) => {
+//         if (imageElement instanceof HTMLImageElement) {
+//           imageElement.src = productDraft.image;
+//         } else {
+//           imageElement.style.backgroundImage = `url('${productDraft.image}')`;
+//         }
+//       });
+//     }
 
-    if (productDraft.stock) {
-      const inStock = productDraft.stock === "in";
+//     if (productDraft.stock) {
+//       const inStock = productDraft.stock === "in";
 
-      document.querySelectorAll(`[data-product-stock="${productId}"]`).forEach((stockElement) => {
-        stockElement.classList.toggle("is-in-stock", inStock);
-        stockElement.classList.toggle("is-out-of-stock", !inStock);
-        stockElement.setAttribute("aria-label", inStock ? "Producto en stock" : "Producto sin stock");
-        stockElement.setAttribute("title", inStock ? "Producto en stock" : "Producto sin stock");
+//       document.querySelectorAll(`[data-product-stock="${productId}"]`).forEach((stockElement) => {
+//         stockElement.classList.toggle("is-in-stock", inStock);
+//         stockElement.classList.toggle("is-out-of-stock", !inStock);
+//         stockElement.setAttribute("aria-label", inStock ? "Producto en stock" : "Producto sin stock");
+//         stockElement.setAttribute("title", inStock ? "Producto en stock" : "Producto sin stock");
 
-        const stockText = stockElement.querySelector("[data-stock-text]") ?? stockElement.querySelector(".stock-text") ?? stockElement.querySelector("span:last-child");
-        if (stockText) {
-          stockText.textContent = inStock ? "En stock" : "Sin stock";
-        }
-      });
+//         const stockText = stockElement.querySelector("[data-stock-text]") ?? stockElement.querySelector(".stock-text") ?? stockElement.querySelector("span:last-child");
+//         if (stockText) {
+//           stockText.textContent = inStock ? "En stock" : "Sin stock";
+//         }
+//       });
 
-      document.querySelectorAll(`[data-product-id="${productId}"]`).forEach((element) => {
-        if ("inStock" in element.dataset) {
-          element.dataset.inStock = String(inStock);
-        }
-      });
-    }
-  });
-}
+//       document.querySelectorAll(`[data-product-id="${productId}"]`).forEach((element) => {
+//         if ("inStock" in element.dataset) {
+//           element.dataset.inStock = String(inStock);
+//         }
+//       });
+//     }
+//   });
+// }
 
-async function loadCatalogDrafts(panel) {
-  const response = await fetch("/api/admin/catalog");
-  const result = await response.json();
+// async function loadCatalogDrafts(panel) {
+//   const response = await fetch("/api/admin/catalog");
+//   const result = await response.json();
 
-  if (!response.ok || !result.ok) {
-    throw new Error(result.message || "No se pudo cargar el catalogo publicado.");
-  }
+//   if (!response.ok || !result.ok) {
+//     throw new Error(result.message || "No se pudo cargar el catalogo publicado.");
+//   }
 
-  writeJson(CATALOG_STORAGE_KEY, result.catalog);
-  syncCatalogInputs(panel, result.catalog);
-  applyCatalogDrafts(result.catalog);
-}
+//   writeJson(CATALOG_STORAGE_KEY, result.catalog);
+//   syncCatalogInputs(panel, result.catalog);
+//   applyCatalogDrafts(result.catalog);
+// }
 
 async function publishCatalogDrafts(catalog) {
   const response = await fetch("/api/admin/catalog", {
@@ -95,30 +95,30 @@ async function publishCatalogDrafts(catalog) {
     throw new Error(result.message || "No se pudo publicar el catalogo.");
   }
 
-  return result.catalog;
+  return catalog;
 }
 
-function syncCatalogInputs(panel, catalogDrafts) {
-  Object.entries(catalogDrafts).forEach(([productId, productDraft]) => {
-    const nameInput = panel.querySelector(`[data-admin-name-input="${productId}"]`);
-    const priceInput = panel.querySelector(`[data-admin-price-input="${productId}"]`);
-    const imageInput = panel.querySelector(`[data-admin-image-input="${productId}"]`);
-    const stockInput = panel.querySelector(`[data-admin-stock-input="${productId}"]`);
-    const imagePreview = panel.querySelector(`[data-admin-image-preview="${productId}"]`);
+// function syncCatalogInputs(panel, catalogDrafts) {
+//   Object.entries(catalogDrafts).forEach(([productId, productDraft]) => {
+//     const nameInput = panel.querySelector(`[data-admin-name-input="${productId}"]`);
+//     const priceInput = panel.querySelector(`[data-admin-price-input="${productId}"]`);
+//     const imageInput = panel.querySelector(`[data-admin-image-input="${productId}"]`);
+//     const stockInput = panel.querySelector(`[data-admin-stock-input="${productId}"]`);
+//     const imagePreview = panel.querySelector(`[data-admin-image-preview="${productId}"]`);
 
-    if (nameInput && productDraft.name) nameInput.value = productDraft.name;
-    if (priceInput && productDraft.price) priceInput.value = productDraft.price;
-    if (imageInput && productDraft.image) {
-      imageInput.value = productDraft.image;
-      if (imagePreview) {
-        imagePreview.style.backgroundImage = `url('${productDraft.image}')`;
-      }
-    }
-    if (stockInput && productDraft.stock) {
-      setStockToggleState(panel, productId, productDraft.stock);
-    }
-  });
-}
+//     if (nameInput && productDraft.name) nameInput.value = productDraft.name;
+//     if (priceInput && productDraft.price) priceInput.value = productDraft.price;
+//     if (imageInput && productDraft.image) {
+//       imageInput.value = productDraft.image;
+//       if (imagePreview) {
+//         imagePreview.style.backgroundImage = `url('${productDraft.image}')`;
+//       }
+//     }
+//     if (stockInput && productDraft.stock) {
+//       setStockToggleState(panel, productId, productDraft.stock);
+//     }
+//   });
+// }
 
 function setStockToggleState(panel, productId, stock) {
   const nextStock = stock === "out" ? "out" : "in";
@@ -273,7 +273,7 @@ export function initAdminPanel() {
 
   panel.hidden = false;
 
-  const catalogDrafts = readJson(CATALOG_STORAGE_KEY, {});
+  // const catalogDrafts = readJson(CATALOG_STORAGE_KEY, {});
   const productDrafts = readJson(PRODUCT_STORAGE_KEY, []);
   const productForm = panel.querySelector("[data-admin-product-form]");
   const draftForm = panel.querySelector("[data-admin-draft-form]");
@@ -285,10 +285,10 @@ export function initAdminPanel() {
   const userForm = panel.querySelector("[data-admin-user-form]");
   const maintenanceToggle = panel.querySelector("[data-maintenance-toggle]");
 
-  syncCatalogInputs(panel, catalogDrafts);
-  applyCatalogDrafts(catalogDrafts);
+  // syncCatalogInputs(panel, catalogDrafts);
+  // applyCatalogDrafts(catalogDrafts);
   renderDrafts(panel, productDrafts);
-  loadCatalogDrafts(panel).catch((error) => setStatus(panel, error.message));
+  // loadCatalogDrafts(panel).catch((error) => setStatus(panel, error.message));
   loadMetrics(panel).catch((error) => setStatus(panel, error.message));
   loadMaintenanceState(panel).catch(() => {});
 
@@ -350,11 +350,9 @@ export function initAdminPanel() {
     });
 
     try {
-      const publishedCatalog = await publishCatalogDrafts(nextCatalog);
-      writeJson(CATALOG_STORAGE_KEY, publishedCatalog);
-      syncCatalogInputs(panel, publishedCatalog);
-      applyCatalogDrafts(publishedCatalog);
-      setStatus(panel, "Catalogo publicado. El cambio se mantiene en produccion.");
+        await publishCatalogDrafts(nextCatalog);
+
+        setStatus(panel, "Productos actualizados correctamente.");
     } catch (error) {
       setStatus(panel, error.message);
     }
@@ -381,8 +379,6 @@ export function initAdminPanel() {
 
   clearCatalogButton?.addEventListener("click", async () => {
     try {
-      await publishCatalogDrafts({});
-      localStorage.removeItem(CATALOG_STORAGE_KEY);
       window.location.reload();
     } catch (error) {
       setStatus(panel, error.message);

@@ -1,33 +1,10 @@
 ---
-// import astroLogo from '../assets/astro.svg';
-// import background from '../assets/background.svg';
-// import UserMenu from './UserMenu.astro';
 import CartDrawer from './CartDrawer.astro';
-import { getProducts } from '../lib/catalog';
 import './CSS/shop.css';
-const products = getProducts();
+// const products = getProducts();
+import { ProductRepository } from '../repositories/ProductRepository';
+const products = await ProductRepository.getProducts();
 ---
-<!-- <div id="bar-menu">
-    <nav>
-        <a id="logo" href=".">CurvySweet</a>
-        <div class="nav">
-            <a href=".">Home</a>
-            <a href="/shop">Tienda</a>
-            <a href="/login" data-guest-link>Iniciar Sesion</a>
-            <a href="/register" data-guest-link>Registrarse</a>
-            <button class="cart-nav-button" type="button" data-cart-open aria-label="Abrir carrito">
-                <span class="cart-nav-icon" aria-hidden="true">Cart</span>
-                <span class="cart-nav-count" data-cart-count>0</span>
-            </button>
-			<UserMenu />
-            <button id="theme-toggle" type="button">Modo oscuro</button>
-        </div>
-    </nav>
-    <button id="menu-toggle-btn" type="button" aria-label="Expandir/Minimizar menú">
-        <span class="menu-toggle-icon"></span>
-    </button>
-
-</div> -->
 <section class="shop-section" id="shop">
 	<div class="shop-header">
 		<p class="shop-kicker">CurvySweet</p>

@@ -1,4 +1,8 @@
-import { getProductById, getProducts, type Product as CatalogProduct } from './catalog';
+import { ProductRepository } from '../repositories/ProductRepository';
+
+type CatalogProduct = Awaited<
+	ReturnType<typeof ProductRepository.getProducts>
+>[number];
 
 export type ProductFeature = {
 	title: string;
@@ -355,19 +359,36 @@ const productContentMap: Record<string, ProductContent> = {
 	},
 };
 
-function mergeGallery(product: CatalogProduct, gallery: string[]) {
-	const normalizedGallery = gallery.map((image) => normalizeImagePath(image));
+function mergeGallery(product: CatalogProduct, fallbackGallery: string[]) {
+
+	const databaseGallery = (product.images ?? [])
+		.map((image) => normalizeImagePath(image))
+		.filter(Boolean);
+
+	if (databaseGallery.length > 0) {
+		return databaseGallery;
+	}
+
+	const normalizedGallery = fallbackGallery.map((image) =>
+		normalizeImagePath(image)
+	);
+
 	const normalizedImage = normalizeImagePath(product.image);
 
 	if (!normalizedImage) {
 		return normalizedGallery;
 	}
 
-	return [normalizedImage, ...normalizedGallery.filter((image) => image !== normalizedImage)];
+	return [
+		normalizedImage,
+		...normalizedGallery.filter((image) => image !== normalizedImage),
+	];
 }
 
-export function getProductPageById(id: string): ProductPageData | undefined {
-	const baseProduct = getProductById(id);
+export async function getProductPageById(
+    id: string
+): Promise<ProductPageData | undefined> {
+	const baseProduct = await ProductRepository.getProductById(id);
 	const productContent = productContentMap[id];
 
 	if (!baseProduct || !productContent) {
@@ -382,22 +403,26 @@ export function getProductPageById(id: string): ProductPageData | undefined {
 	};
 }
 
-export function getRelatedProducts(productId: string) {
-	const pageData = getProductPageById(productId);
+
+
+export async function getRelatedProducts(productId: string) {
+	const pageData = await getProductPageById(productId);
 
 	if (!pageData) {
 		return [];
 	}
 
+	const products = await ProductRepository.getProducts();
+
 	return pageData.relatedProductIds
-		.map((id) => getProducts().find((product) => product.id === id))
+		.map((id) => products.find((product) => product.id === id))
 		.filter((product): product is CatalogProduct => Boolean(product))
 		.map((product) => ({
 			...product,
 			image: normalizeImagePath(product.image),
 		}));
-}
+	}
 
-export const productPageEntries = Object.keys(productContentMap)
-	.map((id) => getProductPageById(id))
-	.filter((product): product is ProductPageData => Boolean(product));
+// export const productPageEntries = Object.keys(productContentMap)
+// 	.map((id) => getProductPageById(id))
+// 	.filter((product): product is ProductPageData => Boolean(product));

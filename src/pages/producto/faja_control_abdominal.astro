@@ -5,13 +5,14 @@ import CartDrawer from '../../components/CartDrawer.astro';
 import { getProductPageById, getRelatedProducts } from '../../lib/product_info';
 import BarMenu from '../../components/BarMenu.astro';
 
-const product = getProductPageById('faja_control_abdominal');
+// const product = getProductPageById('faja_control_abdominal');
+const product = await getProductPageById('faja_control_abdominal');
 
 if (!product) {
 	throw new Error('No se encontro la informacion del producto faja_control_abdominal');
 }
 
-const relatedProducts = getRelatedProducts(product.id);
+const relatedProducts = await getRelatedProducts(product.id);
 const primaryImage = product.gallery[0] ?? product.image ?? '';
 const secondaryImages = product.gallery.slice(1);
 ---

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import Stripe from "stripe";
-import { getProductById } from "../../lib/catalog";
+import { ProductRepository } from "../../repositories/ProductRepository";
 
 const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
 
@@ -33,18 +33,26 @@ export const POST: APIRoute = async ({ request }) => {
 
   const DEV_TEST_PRICE = import.meta.env.STRIPE_TEST_PRICE_ID ?? "";
 
-  const lineItems = requestedItems.map((item) => {
+const lineItems = await Promise.all(
+  requestedItems.map(async (item) => {
     const productId = item.productId?.trim();
     const quantity = Math.max(1, Math.min(Number(item.quantity) || 1, 20));
-    const product = productId ? getProductById(productId) : undefined;
+
+    const product = productId
+      ? await ProductRepository.getProductById(productId)
+      : undefined;
 
     if (!product || !product.inStock) {
       return undefined;
     }
 
-    // Usa el priceId definido en el producto; en modo desarrollo, permite un
-    // `STRIPE_TEST_PRICE_ID` global como fallback para pruebas locales.
-    const priceId = product.stripePriceId || ((import.meta.env.MODE === 'development' && DEV_TEST_PRICE) ? DEV_TEST_PRICE : "");
+    const priceId =
+      product.stripePriceId ||
+      (
+        import.meta.env.MODE === "development" && DEV_TEST_PRICE
+          ? DEV_TEST_PRICE
+          : ""
+      );
 
     if (!priceId) {
       return undefined;
@@ -55,17 +63,34 @@ export const POST: APIRoute = async ({ request }) => {
       quantity,
       productId: product.id,
     };
-  });
+  })
+);
 
   if (lineItems.some((item) => !item) || !lineItems.length) {
-    const invalid = requestedItems
-      .filter((it) => {
-        const pid = it.productId?.trim();
-        const p = pid ? getProductById(pid) : undefined;
-        const hasPriceOrDevFallback = p && (p.stripePriceId || (import.meta.env.MODE === 'development' && DEV_TEST_PRICE));
-        return !p || !p.inStock || !hasPriceOrDevFallback;
-      })
-      .map((it) => it.productId || "(sin id)");
+    const invalid: string[] = [];
+
+    for (const it of requestedItems) {
+
+      const pid = it.productId?.trim();
+
+      const product = pid
+        ? await ProductRepository.getProductById(pid)
+        : undefined;
+
+      const hasPrice =
+        product &&
+        (
+          product.stripePriceId ||
+          (
+            import.meta.env.MODE === "development" &&
+            DEV_TEST_PRICE
+          )
+        );
+
+      if (!product || !product.inStock || !hasPrice) {
+        invalid.push(pid || "(sin id)");
+      }
+    }
 
     return jsonResponse(400, {
       error: "Hay productos invalidos, sin stock o no configurados para pagos.",

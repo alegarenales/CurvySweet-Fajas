@@ -1,8 +1,8 @@
 ---
-import { getProducts } from '../lib/catalog';
+import { ProductRepository } from '../repositories/ProductRepository';
 import './CSS/cart.css';
 
-const cartProducts = getProducts().map((product) => ({
+const cartProducts = (await ProductRepository.getProducts()).map((product) => ({
 	id: product.id,
 	name: product.name,
 	price: product.displayPrice,

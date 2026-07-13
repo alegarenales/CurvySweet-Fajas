@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { existsSync, readFileSync } from "node:fs";
 import { getAdminSession } from "../../../lib/admin";
-import { getProducts } from "../../../lib/catalog";
+import { ProductRepository } from "../../../repositories/ProductRepository";
 
 function metricValue(seed: string, offset: number) {
   return seed.split("").reduce((sum, char) => sum + char.charCodeAt(0), offset) % 80 + 12;
@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ cookies }) => {
   }
 
   const visits = getVisits();
-  const products = getProducts();
+  const products = await ProductRepository.getProducts();
 
   return new Response(
     JSON.stringify({

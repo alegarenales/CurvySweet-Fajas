@@ -347,11 +347,10 @@ body {
 }
 
 .product-card[data-product-id="cinturilla_reloj_arena"] .product-image-layer {
-	background-size: contain;
-	background-position: center;
-	inset: 2px;
-	border-radius: 10px;
-	background-color: #fff;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+    inset: 0;
 }
 
 .product-card[data-product-id="cinturilla_reloj_arena"] .product-image {
