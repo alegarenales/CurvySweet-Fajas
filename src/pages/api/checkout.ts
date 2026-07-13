@@ -99,8 +99,10 @@ const lineItems = await Promise.all(
   }
 
   const stripe = new Stripe(stripeSecretKey, { apiVersion: '2026-05-27.dahlia' });
-  const successUrl = new URL("/success?session_id={CHECKOUT_SESSION_ID}", request.url).toString();
-  const cancelUrl = new URL("/cancel", request.url).toString();
+  const baseUrl = import.meta.env.PUBLIC_SITE_URL;
+
+  const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${baseUrl}/cancel`;
 
   try {
     const session = await stripe.checkout.sessions.create({
