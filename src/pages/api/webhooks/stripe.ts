@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
 import { sendPurchaseEmail } from "../../../lib/mail";
+import { OrderRepository } from "../../../repositories/OrderRepository";
+import { UserRepository } from "../../../repositories/UserRepository";
 import Stripe from "stripe";
 
 const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
@@ -30,7 +32,15 @@ switch (event.type) {
 
   case "checkout.session.completed": {
 
-    const session = event.data.object as Stripe.Checkout.Session;
+    const session = await stripe.checkout.sessions.retrieve(
+      (event.data.object as Stripe.Checkout.Session).id,
+      {
+        expand: [
+          "line_items",
+          "customer"
+          ]
+      }
+    );
 
     console.log("Pago confirmado:", {
       sessionId: session.id,
@@ -38,21 +48,72 @@ switch (event.type) {
       amountTotal: session.amount_total ?? null,
       currency: session.currency ?? null,
     });
+    const usuarioId = session.metadata?.usuarioId || null;
+    const usuario = usuarioId
+      ? await UserRepository.getById(usuarioId)
+      : null;
+      console.log("Usuario asociado:", usuario);
+    const pedidoId = await OrderRepository.createOrder({
+
+      stripeSessionId: session.id,
+
+      usuarioId,
+
+      nombre: usuario?.Name ?? session.customer_details?.name ?? "Cliente",
+
+      email: session.customer_details?.email ?? "",
+
+      telefono: session.customer_details?.phone ?? null,
+
+      importeTotal: (session.amount_total ?? 0) / 100
+
+    });
+    for (const item of session.line_items?.data ?? []) {
+
+      await OrderRepository.addProduct({
+
+        pedidoId,
+
+        productoId: item.price?.id ?? "",
+
+        nombreProducto: item.description,
+
+        cantidad: item.quantity ?? 1,
+
+        precioUnitario:
+          ((item.amount_total ?? 0) / 100) /
+          (item.quantity ?? 1),
+
+      });
+
+    }
 
     const email = session.customer_details?.email;
 
     if (email) {
       await sendPurchaseEmail({
-        to: email,
-        name: session.customer_details?.name ?? "Cliente",
-        products: [
-          {
-            name: "Tu pedido CurvySweet",
-            quantity: 1,
-            price: `${((session.amount_total ?? 0) / 100).toFixed(2)} €`,
-          },
-        ],
-        total: `${((session.amount_total ?? 0) / 100).toFixed(2)} €`,
+
+          to: email,
+
+          name: usuario?.Name ?? session.customer_details?.name ?? "Cliente",
+
+          products:
+
+              (session.line_items?.data ?? []).map(item => ({
+
+                  name: item.description,
+
+                  quantity: item.quantity ?? 1,
+
+                  price: `${(
+                    ((item.amount_total ?? 0) / 100) /
+                    (item.quantity ?? 1)
+                  ).toFixed(2)} €`
+
+              })),
+
+          total: `${((session.amount_total ?? 0) / 100).toFixed(2)} €`
+
       });
     }
 

@@ -3,6 +3,7 @@ import type { APIRoute } from "astro";
 import { clearAdminSession, isAdminEmail, setAdminSession } from "../../lib/admin";
 import { sendLoginEmail } from "../../lib/mail";
 import { loginUsuario } from "../../lib/users";
+import { clearUserSession, setUserSession } from "../../lib/userSession";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const data = await request.formData();
@@ -15,8 +16,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       mail,
       password,
     });
+    const userData = result.recordsets?.[1]?.[0];
+    console.log(JSON.stringify(result, null, 2));
 
     const isAdmin = result.ok && isAdminEmail(mail);
+
+    if (result.ok && userData?.ID) {
+      setUserSession(cookies, userData.ID);
+    } else {
+      clearUserSession(cookies);
+    }
 
     if (isAdmin) {
       setAdminSession(cookies, mail);
@@ -28,7 +37,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       try {
         await sendLoginEmail({
           to: mail,
-          name: mail,
+          name: userData?.Name ?? mail,
         });
       } catch (emailError) {
         console.error("Error enviando correo de inicio de sesion:", emailError);
@@ -40,9 +49,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         ok: result.ok,
         message: result.message,
         user: {
-          name: mail.split("@")[0],
-          username: mail.split("@")[0],
-          mail,
+          id: userData?.ID,
+          name: userData?.Name,
+          lastName: userData?.Last_name,
+          username: userData?.Username,
+          mail: userData?.Mail,
+          rol: userData?.Rol,
           isAdmin,
         },
         data: result,

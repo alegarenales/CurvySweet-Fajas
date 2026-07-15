@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import Stripe from "stripe";
 import { ProductRepository } from "../../repositories/ProductRepository";
+import { getUserSession } from "../../lib/userSession";
 
 const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
 
@@ -13,7 +14,7 @@ function jsonResponse(status: number, payload: Record<string, string>) {
   });
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   if (!stripeSecretKey) {
     return jsonResponse(500, {
       error: "Falta configurar STRIPE_SECRET_KEY en el entorno del servidor.",
@@ -97,7 +98,7 @@ const lineItems = await Promise.all(
       invalidProducts: invalid.join(","),
     });
   }
-
+  const user = getUserSession(cookies);
   const stripe = new Stripe(stripeSecretKey, { apiVersion: '2026-05-27.dahlia' });
   const baseUrl = import.meta.env.PUBLIC_SITE_URL;
 
@@ -118,6 +119,7 @@ const lineItems = await Promise.all(
       phone_number_collection: { enabled: true },
       metadata: {
         productIds: lineItems.map((item) => item!.productId).join(","),
+        usuarioId: user?.id ?? "",
       },
     });
 
