@@ -294,6 +294,23 @@ select:focus {
 	gap: 12px;
 	margin: 18px 0;
 }
+.order-card-link {
+	display: block;
+	color: inherit;
+	text-decoration: none;
+}
+
+.order-card-link:hover,
+.order-card-link:visited,
+.order-card-link:active {
+	color: inherit;
+	text-decoration: none;
+}
+
+.order-card-link:focus-visible .order-card {
+	outline: 3px solid rgba(201, 49, 120, .25);
+	outline-offset: 2px;
+}
 
 .payment-card,
 .order-card {
@@ -301,6 +318,22 @@ select:focus {
 	align-items: center;
 	justify-content: space-between;
 	gap: 18px;
+}
+
+.order-card {
+	cursor: pointer;
+	transition:
+		transform .20s ease,
+		box-shadow .20s ease,
+		border-color .20s ease,
+		background-color .20s ease;
+}
+
+.order-card-link:hover .order-card {
+	transform: translateY(-3px);
+	box-shadow: 0 10px 24px rgba(0,0,0,.08);
+	border-color: var(--account-accent);
+	background: #fffdfd;
 }
 
 .payment-card div,

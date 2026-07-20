@@ -46,5 +46,87 @@ export class OrderRepository {
             .execute("sp_order_product_create");
 
     }
+    static async getProductsByOrder(pedidoId: string) {
+
+        const pool = await getPool();
+
+        const result = await pool.request()
+            .input("PedidoId", pedidoId)
+            .query(`
+                SELECT
+                    ProductoId,
+                    NombreProducto,
+                    Cantidad,
+                    PrecioUnitario
+                FROM PedidoProductos
+                WHERE PedidoId = @PedidoId
+            `);
+
+        return result.recordset;
+
+    }
+    static async getOrderById(id: string, usuarioId: string) {
+
+        const pool = await getPool();
+
+        const result = await pool.request()
+            .input("Id", id)
+            .input("UsuarioId", usuarioId)
+            .query(`
+                SELECT
+                    Id,
+                    Fecha,
+                    Estado,
+                    ImporteTotal
+                FROM Pedidos
+                WHERE Id = @Id
+                AND UsuarioId = @UsuarioId
+            `);
+
+        return result.recordset[0] ?? null;
+
+    }
+    static async getAllOrders() {
+        const pool = await getPool();
+
+        const result = await pool.request().query(`
+            SELECT
+                p.Id,
+                p.Fecha,
+                p.Estado,
+                p.ImporteTotal,
+                u.Id AS UsuarioId,
+                u.Nombre,
+                u.Apellidos,
+                u.Email
+            FROM Pedidos p
+            INNER JOIN Usuarios u
+                ON p.UsuarioId = u.Id
+            ORDER BY p.Fecha DESC
+        `);
+
+        return result.recordset;
+    }
+    static async getOrdersByUser(usuarioId: string) {
+
+        const pool = await getPool();
+
+        const result = await pool
+            .request()
+            .input("UsuarioId", usuarioId)
+            .query(`
+                SELECT
+                    Id,
+                    Fecha,
+                    Estado,
+                    ImporteTotal
+                FROM Pedidos
+                WHERE UsuarioId = @UsuarioId
+                ORDER BY Fecha DESC
+            `);
+
+        return result.recordset;
+
+    }
 
 }

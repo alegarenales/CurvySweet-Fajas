@@ -86,33 +86,79 @@ function renderCards() {
     .join("");
 }
 
-function renderOrders() {
-  const orders = readJson(userKey(ORDERS_KEY), []);
+async function renderOrders() {
+
   const list = document.querySelector("[data-order-list]");
   if (!list) return;
 
-  if (!orders.length) {
+  try {
+
+    const response = await fetch("/api/orders");
+
+    if (!response.ok) {
+      throw new Error();
+    }
+
+    const orders = await response.json();
+
+    if (!orders.length) {
+      list.innerHTML = `
+        <section class="empty-state order-empty">
+          <span class="empty-icon">0</span>
+          <strong>Todavía no has realizado ningún pedido</strong>
+          <span>Cuando completes una compra aparecerá aquí con su estado y referencia.</span>
+          <a href="/shop">Explorar tienda</a>
+        </section>
+      `;
+      return;
+    }
+
+    list.innerHTML = orders
+      .map(order => `
+        <a href="/pedido/${order.Id}" class="order-card-link">
+
+          <article class="order-card">
+
+            <div class="order-header">
+              <div>
+                <span>Pedido ${escapeHtml(order.Id.slice(0, 8))}</span>
+                <strong>${Number(order.ImporteTotal).toFixed(2)} €</strong>
+              </div>
+
+              <div>
+                <span>${new Date(order.Fecha).toLocaleDateString("es-ES")}</span>
+                <strong class="order-status">${escapeHtml(order.Estado)}</strong>
+              </div>
+            </div>
+
+            <div class="order-products">
+
+              ${(order.Productos || []).map(product => `
+                <div class="order-product">
+                  <span>${escapeHtml(product.NombreProducto)}</span>
+                  <span>x${product.Cantidad}</span>
+                  <strong>${Number(product.PrecioUnitario).toFixed(2)} €</strong>
+                </div>
+              `).join("")}
+
+            </div>
+
+          </article>
+
+        </a>
+      `)
+      .join("");
+
+  } catch {
+
     list.innerHTML = `
       <section class="empty-state order-empty">
-        <span class="empty-icon">0</span>
-        <strong>Todavía no has realizado ningún pedido</strong>
-        <span>Cuando completes una compra aparecerá aquí con su estado y referencia.</span>
-        <a href="/shop">Explorar tienda</a>
+        <strong>No se pudieron cargar los pedidos.</strong>
       </section>
     `;
-    return;
+
   }
 
-  list.innerHTML = orders
-    .map(
-      (order) => `
-        <article class="order-card">
-          <div><span>Pedido ${escapeHtml(order.id)}</span><strong>${escapeHtml(order.total || "Compra confirmada")}</strong></div>
-          <div><span>${escapeHtml(order.date || "")}</span><strong class="order-status">${escapeHtml(order.status || "Confirmado")}</strong></div>
-        </article>
-      `,
-    )
-    .join("");
 }
 
 function init() {

@@ -1,0 +1,106 @@
+---
+import BarMenu from "../../components/BarMenu.astro";
+
+const { id } = Astro.params;
+
+const response = await fetch(
+    new URL(`/api/orders/${id}`, Astro.url),
+    {
+        headers: {
+            cookie: Astro.request.headers.get("cookie") ?? "",
+        },
+    }
+);
+
+if (!response.ok) {
+    return Astro.redirect("/perfil?tab=orders");
+}
+
+const order = await response.json();
+---
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pedido</title>
+</head>
+
+<body>
+
+<BarMenu />
+
+<main class="order-detail">
+
+    <a href="/perfil?tab=orders">
+        ← Volver a mis pedidos
+    </a>
+
+    <h1>
+        Pedido #{order.Id.slice(0,8)}
+    </h1>
+
+    <p>
+        Estado:
+        <strong>{order.Estado}</strong>
+    </p>
+
+    <p>
+        Fecha:
+        {new Date(order.Fecha).toLocaleDateString("es-ES")}
+    </p>
+
+    <h2>Productos</h2>
+
+    <ul>
+
+        {order.Productos.map((producto:any)=>(
+
+            <li>
+
+                <strong>{producto.NombreProducto}</strong>
+
+                <br />
+
+                Cantidad:
+                {producto.Cantidad}
+
+                <br />
+
+                Precio:
+                {Number(producto.PrecioUnitario).toFixed(2)} €
+
+            </li>
+
+        ))}
+
+    </ul>
+
+    <hr />
+
+    <h3>
+        Total:
+        {Number(order.ImporteTotal).toFixed(2)} €
+    </h3>
+
+    <hr />
+
+    <p>
+        🚚 Seguimiento:
+        <em>Próximamente</em>
+    </p>
+
+    <p>
+        💳 Método de pago:
+        <em>Próximamente</em>
+    </p>
+
+    <p>
+        📍 Dirección:
+        <em>Próximamente</em>
+    </p>
+
+</main>
+
+</body>
+</html>
