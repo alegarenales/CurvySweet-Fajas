@@ -129,7 +129,7 @@ export async function sendPurchaseEmail({
     from: import.meta.env.SMTP_FROM,
     to,
     subject: "💖 Gracias por tu compra en CurvySweet",
-    text: `Hola Curvy, hemos recibido correctamente tu pedido. Muchas gracias por confiar en CurvySweet.`,
+    text: `Hola ${name}, hemos recibido correctamente tu pedido. Muchas gracias por confiar en CurvySweet.`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:650px;margin:auto;color:#333">
 
@@ -137,7 +137,7 @@ export async function sendPurchaseEmail({
           ¡Gracias por tu compra!
         </h1>
 
-        <p>Hola Curvy</p>
+        <p>Hola ${name},</p>
 
         <p>
           Hemos recibido correctamente tu pedido y ya nos hemos puesto manos a la obra para prepararlo.

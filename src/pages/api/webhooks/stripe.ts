@@ -49,10 +49,11 @@ switch (event.type) {
       currency: session.currency ?? null,
     });
     const usuarioId = session.metadata?.usuarioId || null;
+    console.log("usuarioId:", usuarioId);
     const usuario = usuarioId
       ? await UserRepository.getById(usuarioId)
       : null;
-      console.log("Usuario asociado:", usuario);
+      console.log("usuario:", usuario);
     const pedidoId = await OrderRepository.createOrder({
 
       stripeSessionId: session.id,
