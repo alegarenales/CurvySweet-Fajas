@@ -175,3 +175,85 @@ export async function sendPurchaseEmail({
     `,
   });
 }
+
+type OrderStatusEmailInput = {
+  to: string;
+  name: string;
+  status: string;
+};
+
+export async function sendOrderStatusEmail({
+  to,
+  name,
+  status,
+}: OrderStatusEmailInput) {
+
+  if (!hasMailConfig()) {
+    console.warn("No se envió el correo de cambio de estado.");
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: import.meta.env.SMTP_HOST,
+    port: Number(import.meta.env.SMTP_PORT),
+    secure: import.meta.env.SMTP_SECURE === "true",
+    auth: {
+      user: import.meta.env.SMTP_USER,
+      pass: import.meta.env.SMTP_PASSWORD,
+    },
+  });
+
+  const messages: Record<string, string> = {
+    Pendiente:
+      "Hemos recibido tu pedido correctamente y comenzaremos a prepararlo en breve.",
+
+    Preparando:
+      "Nuestro equipo ya está preparando tu pedido con mucho cariño.",
+
+    Enviado:
+      "¡Buenas noticias! Tu pedido ya ha sido enviado y pronto lo recibirás.",
+
+    Entregado:
+      "Tu pedido ha sido entregado. Esperamos que disfrutes muchísimo de tu compra.",
+
+    Cancelado:
+      "Tu pedido ha sido cancelado. Si tienes cualquier duda puedes contactar con nosotros.",
+  };
+
+  const message =
+    messages[status] ??
+    "El estado de tu pedido ha cambiado.";
+
+  await transporter.sendMail({
+    from: import.meta.env.SMTP_FROM,
+    to,
+    subject: `Actualización de tu pedido - ${status}`,
+    text: `Hola ${name}. ${message}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:650px;margin:auto;color:#333">
+
+        <h1 style="color:#d63384;">
+          Estado actualizado
+        </h1>
+
+        <p>Hola <strong>${name}</strong>,</p>
+
+        <p>${message}</p>
+
+        <p>
+          <strong>Estado actual:</strong>
+          ${status}
+        </p>
+
+        <hr style="margin:30px 0;">
+
+        <p>
+          Gracias por confiar en
+          <strong>CurvySweet</strong> 💕
+        </p>
+
+      </div>
+    `,
+  });
+
+}

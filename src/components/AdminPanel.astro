@@ -32,10 +32,10 @@ const { adminEmail } = Astro.props;
         <button type="button" class="is-active" data-admin-tab="catalog">Catalogo</button>
         <button type="button" data-admin-tab="analytics">Graficas</button>
         <button type="button" data-admin-tab="users">Usuarios</button>
-        <button type="button" data-admin-tab="site">Sitio</button>
         <button type="button" data-admin-tab="orders">
             Pedidos
         </button>
+        <button type="button" data-admin-tab="site">Sitio</button>
       </nav>
     </header>
 
@@ -186,6 +186,41 @@ const { adminEmail } = Astro.props;
       </section>
     </div>
 
+    <div class="admin-panel-view" data-admin-view="orders">
+      <section class="admin-tool admin-tool-wide">
+            <div class="admin-tool-heading">
+                <h2>Pedidos</h2>
+                <button type="button" data-admin-refresh-orders>
+                    Actualizar
+                </button>
+            </div>
+
+            <div class="admin-orders-list">
+
+                <table class="admin-orders-table">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Email</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody data-admin-orders-list>
+                        <tr>
+                            <td colspan="7">Cargando pedidos...</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </section>
+    </div>
     <div class="admin-panel-view" data-admin-view="site">
       <section class="admin-tool admin-tool-actions">
         <h2>Sitio</h2>
@@ -203,6 +238,50 @@ const { adminEmail } = Astro.props;
     </div>
 
     <p class="admin-panel-status" data-admin-panel-status aria-live="polite"></p>
+  </div>
+
+  <div id="order-modal" class="order-modal hidden">
+
+      <div class="order-modal-content">
+
+          <div class="order-modal-header">
+
+              <div>
+
+                  <h2 id="order-modal-title">
+                      Pedido
+                  </h2>
+
+                  <span id="order-modal-subtitle">
+                      Detalle del pedido
+                  </span>
+
+              </div>
+
+              <div class="order-modal-actions">
+
+                  <span id="order-status-badge" class="order-status-badge">
+                      Pendiente
+                  </span>
+
+                  <button
+                      id="close-order-modal"
+                      class="order-modal-close"
+                      type="button">
+                      ✕
+                  </button>
+
+              </div>
+
+          </div>
+
+          <div id="order-modal-body"></div>
+
+      </div>
+
+  </div>
+  <div id="toast" class="toast hidden">
+      <span id="toast-message"></span>
   </div>
 </aside>
 

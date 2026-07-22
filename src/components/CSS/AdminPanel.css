@@ -457,3 +457,261 @@
     min-height: 180px;
   }
 }
+
+.order-modal{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    padding: 40px 20px;
+
+    overflow-y: auto;
+
+    z-index: 9999;
+}
+
+.order-modal.hidden{
+    display:none;
+}
+
+.order-modal-content{
+    width: min(820px, 92vw);
+
+    max-height: none;
+
+    overflow: visible;
+
+    margin-bottom: 40px;
+
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,.3);
+}
+
+.order-modal-close{
+    position:absolute;
+    right:18px;
+    top:18px;
+    border:none;
+    background:none;
+    cursor:pointer;
+    font-size:22px;
+}
+
+.order-products{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+.order-products th,
+.order-products td{
+    padding:10px;
+    border-bottom:1px solid #e5e5e5;
+    text-align:left;
+}
+
+.order-info{
+    display:grid;
+    grid-template-columns:150px 1fr;
+    gap:10px;
+    margin-top:20px;
+}
+
+.order-info strong{
+    color:#444;
+}
+
+
+.order-modal-content{
+    color:#222;
+}
+
+.order-modal-content h2,
+.order-modal-content h3{
+    color:#222;
+}
+
+.order-modal-content span,
+.order-modal-content td,
+.order-modal-content th{
+    color:#222;
+}
+
+.order-modal-content table{
+    color:#222;
+}
+
+.order-modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:18px;
+    border-bottom:1px solid #ececec;
+    margin-bottom:25px;
+}
+
+.order-modal-header h2{
+    margin:0;
+    font-size:1.6rem;
+}
+
+#order-modal-subtitle{
+    display:block;
+    margin-top:6px;
+    color:#777;
+    font-size:.9rem;
+}
+
+.order-modal-actions{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.order-status-badge{
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:.85rem;
+    font-weight:700;
+}
+
+.order-status-badge.pendiente{
+    background:#fff3cd;
+    color:#8a6d00;
+}
+
+.order-status-badge.preparando{
+    background:#dbeafe;
+    color:#1d4ed8;
+}
+
+.order-status-badge.enviado{
+    background:#d1fae5;
+    color:#047857;
+}
+
+.order-status-badge.entregado{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.order-status-badge.cancelado{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+.order-actions{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:25px;
+}
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+
+    min-width: 280px;
+    max-width: 420px;
+
+    padding: 14px 18px;
+    border-radius: 10px;
+
+    color: #fff;
+    font-weight: 600;
+
+    background: #16a34a;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+
+    opacity: 1;
+    transform: translateY(0);
+
+    transition:
+        opacity .25s,
+        transform .25s;
+
+    z-index: 99999;
+}
+
+.toast.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+.toast.error {
+    background: #dc2626;
+}
+
+.toast.warning {
+    background: #f59e0b;
+}
+
+.toast.info {
+    background: #2563eb;
+}
+
+#shipping-fields {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.order-history {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.history-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    position: relative;
+}
+
+.history-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 34px;
+    width: 2px;
+    height: calc(100% + 6px);
+    background: #d6d6d6;
+}
+
+.history-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.history-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-content strong {
+    font-size: 15px;
+}
+
+.history-content span {
+    color: #777;
+    font-size: 13px;
+}

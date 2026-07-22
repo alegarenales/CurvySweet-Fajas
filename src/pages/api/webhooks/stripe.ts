@@ -69,6 +69,10 @@ switch (event.type) {
       importeTotal: (session.amount_total ?? 0) / 100
 
     });
+    await OrderRepository.addHistory(
+        pedidoId,
+        "Pendiente"
+    );
     for (const item of session.line_items?.data ?? []) {
 
       await OrderRepository.addProduct({

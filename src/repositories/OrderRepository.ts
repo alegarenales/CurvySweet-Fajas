@@ -65,25 +65,117 @@ export class OrderRepository {
         return result.recordset;
 
     }
-    static async getOrderById(id: string, usuarioId: string) {
+    static async getOrderById(id: string, usuarioId?: string) {
+
+        const pool = await getPool();
+
+        const request = pool.request()
+            .input("Id", id);
+
+        let query = `
+            SELECT
+                P.Id,
+                P.Fecha,
+                P.Estado,
+                P.ImporteTotal,
+                P.Transportista,
+                P.NumeroSeguimiento,
+                U.Name,
+                U.Mail
+            FROM Pedidos P
+            INNER JOIN USERS U
+                ON U.ID = P.UsuarioId
+            WHERE P.Id = @Id
+        `;
+
+        if (usuarioId) {
+            request.input("UsuarioId", usuarioId);
+
+            query += `
+                AND P.UsuarioId = @UsuarioId
+            `;
+        }
+
+        const result = await request.query(query);
+
+        const order = result.recordset[0];
+
+        if (!order) {
+            return null;
+        }
+
+        order.Productos = await this.getProductsByOrder(id);
+        order.Historial = await this.getHistory(id);
+
+        return order;
+
+    }
+    static async updateOrderStatus(
+        id: string,
+        estado: string,
+        transportista?: string | null,
+        numeroSeguimiento?: string | null
+    ) {
+
+        const pool = await getPool();
+
+        await pool.request()
+            .input("Id", id)
+            .input("Estado", estado)
+            .input("Transportista", transportista ?? null)
+            .input("NumeroSeguimiento", numeroSeguimiento ?? null)
+            .query(`
+                UPDATE Pedidos
+                SET
+                    Estado = @Estado,
+                    Transportista = @Transportista,
+                    NumeroSeguimiento = @NumeroSeguimiento
+                WHERE Id = @Id
+            `);
+
+    }
+    static async addHistory(
+        pedidoId: string,
+        estado: string
+    ) {
+
+        const pool = await getPool();
+
+        await pool.request()
+            .input("PedidoId", pedidoId)
+            .input("Estado", estado)
+            .query(`
+                INSERT INTO PedidoHistorial
+                (
+                    PedidoId,
+                    Estado
+                )
+                VALUES
+                (
+                    @PedidoId,
+                    @Estado
+                )
+            `);
+
+    }
+    static async getHistory(
+        pedidoId: string
+    ) {
 
         const pool = await getPool();
 
         const result = await pool.request()
-            .input("Id", id)
-            .input("UsuarioId", usuarioId)
+            .input("PedidoId", pedidoId)
             .query(`
                 SELECT
-                    Id,
-                    Fecha,
                     Estado,
-                    ImporteTotal
-                FROM Pedidos
-                WHERE Id = @Id
-                AND UsuarioId = @UsuarioId
+                    Fecha
+                FROM PedidoHistorial
+                WHERE PedidoId = @PedidoId
+                ORDER BY Fecha ASC
             `);
 
-        return result.recordset[0] ?? null;
+        return result.recordset;
 
     }
     static async getAllOrders() {
@@ -95,13 +187,14 @@ export class OrderRepository {
                 p.Fecha,
                 p.Estado,
                 p.ImporteTotal,
-                u.Id AS UsuarioId,
-                u.Nombre,
-                u.Apellidos,
-                u.Email
+                p.Transportista,
+                p.NumeroSeguimiento,
+                u.ID AS UsuarioId,
+                u.Name,
+                u.Mail
             FROM Pedidos p
-            INNER JOIN Usuarios u
-                ON p.UsuarioId = u.Id
+            INNER JOIN USERS u
+                ON p.UsuarioId = u.ID
             ORDER BY p.Fecha DESC
         `);
 
@@ -128,5 +221,4 @@ export class OrderRepository {
         return result.recordset;
 
     }
-
 }

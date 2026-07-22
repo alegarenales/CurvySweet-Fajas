@@ -1,6 +1,16 @@
 // const CATALOG_STORAGE_KEY = "curvysweetAdminCatalogDrafts";
 const PRODUCT_STORAGE_KEY = "curvysweetAdminProductDrafts";
 const USER_STORAGE_KEY = "curvysweetUser";
+const orderModal = document.getElementById("order-modal");
+const orderModalBody = document.getElementById("order-modal-body");
+const closeOrderModal = document.getElementById("close-order-modal");
+const orderModalTitle = document.getElementById("order-modal-title");
+const orderStatusBadge = document.getElementById("order-status-badge");
+
+const toast = document.getElementById("toast");
+const toastMessage = document.getElementById("toast-message");
+
+let toastTimeout;
 
 function readJson(key, fallback) {
   try {
@@ -243,6 +253,298 @@ function renderUsers(panel, users) {
   }
 }
 
+function renderOrders(panel, orders) {
+
+    const list = panel.querySelector("[data-admin-orders-list]");
+
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    orders.forEach((order) => {
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${order.Id}</td>
+            <td>${order.Name}</td>
+            <td>${order.Mail}</td>
+            <td>${new Date(order.Fecha).toLocaleDateString("es-ES")}</td>
+            <td>${order.ImporteTotal} €</td>
+            <td data-order-state="${order.Id}">
+                ${order.Estado}
+            </td>
+            <td>
+                <button
+                    type="button"
+                    class="admin-primary-button"
+                    data-order-id="${order.Id}">
+                    Ver
+                </button>
+            </td>
+        `;
+
+        list.appendChild(row);
+
+    });
+    list.querySelectorAll("[data-order-id]").forEach((button) => {
+
+      button.addEventListener("click", async () => {
+
+          const orderId = button.dataset.orderId;
+
+          const response = await fetch(`/api/admin/orders/${orderId}`);
+          const result = await response.json();
+
+          const order = result;
+
+          orderModal.dataset.orderId = order.Id;
+
+          orderModalTitle.textContent = `Pedido #${order.Id.substring(0, 8)}`;
+          orderStatusBadge.textContent = order.Estado;
+          orderStatusBadge.className = `order-status-badge ${order.Estado.toLowerCase()}`;
+
+          orderModalBody.innerHTML = `
+              <div class="order-info">
+
+                  <strong>ID</strong>
+                  <span>${order.Id}</span>
+
+                  <strong>Cliente</strong>
+                  <span>${order.Name}</span>
+
+                  <strong>Email</strong>
+                  <span>${order.Mail}</span>
+
+                  <strong>Fecha</strong>
+                  <span>${new Date(order.Fecha).toLocaleString()}</span>
+
+                  <strong>Estado</strong>
+
+                  <select id="order-status-select">
+
+                      <option value="Pendiente" ${order.Estado === "Pendiente" ? "selected" : ""}>
+                          Pendiente
+                      </option>
+
+                      <option value="Preparando" ${order.Estado === "Preparando" ? "selected" : ""}>
+                          Preparando
+                      </option>
+
+                      <option value="Enviado" ${order.Estado === "Enviado" ? "selected" : ""}>
+                          Enviado
+                      </option>
+
+                      <option value="Entregado" ${order.Estado === "Entregado" ? "selected" : ""}>
+                          Entregado
+                      </option>
+
+                      <option value="Cancelado" ${order.Estado === "Cancelado" ? "selected" : ""}>
+                          Cancelado
+                      </option>
+
+                  </select>
+                  <div id="shipping-fields">
+
+                      <strong>Transportista</strong>
+
+                      <select id="shipping-company">
+
+                          <option value="">Selecciona...</option>
+
+                          <option value="Correos Express" ${order.Transportista === "Correos Express" ? "selected" : ""}>
+                              Correos Express
+                          </option>
+
+                          <option value="GLS" ${order.Transportista === "GLS" ? "selected" : ""}>
+                              GLS
+                          </option>
+
+                          <option value="MRW" ${order.Transportista === "MRW" ? "selected" : ""}>
+                              MRW
+                          </option>
+
+                          <option value="SEUR" ${order.Transportista === "SEUR" ? "selected" : ""}>
+                              SEUR
+                          </option>
+
+                          <option value="DHL" ${order.Transportista === "DHL" ? "selected" : ""}>
+                              DHL
+                          </option>
+
+                      </select>
+
+                      <strong>Número de seguimiento</strong>
+
+                      <input
+                          id="tracking-number"
+                          type="text"
+                          value="${order.NumeroSeguimiento ?? ""}"
+                          placeholder="Ej. PQ123456789ES"
+                      />
+
+                  </div>
+                  <strong>Total</strong>
+                  <span>${order.ImporteTotal.toFixed(2)} €</span>
+
+              </div>
+
+              <h3 style="margin-top:30px;">Productos</h3>
+
+              <table class="order-products">
+
+                  <thead>
+                      <tr>
+                          <th>Producto</th>
+                          <th>Cantidad</th>
+                          <th>Precio</th>
+                      </tr>
+                  </thead>
+
+                  <tbody>
+
+                      ${order.Productos.map(product => `
+                          <tr>
+                              <td>${product.NombreProducto}</td>
+                              <td>${product.Cantidad}</td>
+                              <td>${product.PrecioUnitario.toFixed(2)} €</td>
+                          </tr>
+                      `).join("")}
+
+                  </tbody>
+
+              </table>
+              <h3 style="margin-top:30px;">Historial</h3>
+
+              <div class="order-history">
+
+                  ${order.Historial.map(item => {
+
+                      let icon = "⚪";
+
+                      switch (item.Estado) {
+                          case "Pendiente":
+                              icon = "🟢";
+                              break;
+
+                          case "Preparando":
+                              icon = "🟡";
+                              break;
+
+                          case "Enviado":
+                              icon = "🚚";
+                              break;
+
+                          case "Entregado":
+                              icon = "📦";
+                              break;
+
+                          case "Cancelado":
+                              icon = "❌";
+                              break;
+                      }
+
+                      return `
+                          <div class="history-item">
+
+                              <div class="history-icon">
+                                  ${icon}
+                              </div>
+
+                              <div class="history-content">
+
+                                  <strong>${item.Estado}</strong>
+
+                                  <span>
+                                      ${new Date(item.Fecha).toLocaleString("es-ES")}
+                                  </span>
+
+                              </div>
+
+                          </div>
+                      `;
+
+                  }).join("")}
+
+              </div>
+              <div class="order-actions">
+
+                  <button
+                      id="save-order-status"
+                      class="admin-primary-button">
+
+                      Guardar cambios
+
+                  </button>
+
+              </div>
+          `;
+          console.log(orderModal);
+          console.log(orderModalBody);
+          orderModal.classList.remove("hidden");
+          const saveButton = document.getElementById("save-order-status");
+          const statusSelect = document.getElementById("order-status-select");
+          const shippingCompany = document.getElementById("shipping-company");
+          const trackingNumber = document.getElementById("tracking-number");
+
+          const shippingFields = document.getElementById("shipping-fields");
+
+          function toggleShippingFields() {
+            if (!shippingFields) return;
+
+            shippingFields.style.display =
+                statusSelect.value === "Enviado"
+                    ? ""
+                    : "none";
+          }
+          statusSelect.addEventListener("change", toggleShippingFields);
+
+          toggleShippingFields();
+          saveButton.onclick = async () => {
+
+              const response = await fetch(
+                  `/api/admin/orders/${orderModal.dataset.orderId}`,
+                  {
+                      method: "PATCH",
+                      headers: {
+                          "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify({
+                          estado: statusSelect.value,
+                          transportista: shippingCompany.value,
+                          numeroSeguimiento: trackingNumber.value
+                      })
+                  }
+              );
+
+              const result = await response.json();
+
+              if (!response.ok || !result.ok) {
+                  showToast(result.message, "error");
+                  return;
+              }
+
+              orderStatusBadge.textContent = statusSelect.value;
+              orderStatusBadge.className =
+                  `order-status-badge ${statusSelect.value.toLowerCase()}`;
+
+
+              const stateCell = document.querySelector(
+                  `[data-order-state="${orderModal.dataset.orderId}"]`
+              );
+
+              if (stateCell) {
+                  stateCell.textContent = statusSelect.value;
+              }
+
+              showToast("Estado actualizado correctamente");
+              orderStatusBadge.textContent = statusSelect.value;
+              orderStatusBadge.className =
+                  `order-status-badge ${statusSelect.value.toLowerCase()}`;
+          };
+        });
+    });
+}
 async function loadUsers(panel) {
   const response = await fetch("/api/admin/users");
   const result = await response.json();
@@ -252,6 +554,18 @@ async function loadUsers(panel) {
   }
 
   renderUsers(panel, result.users);
+}
+async function loadOrders(panel) {
+
+  const response = await fetch("/api/admin/orders");
+  const result = await response.json();
+
+  if (!response.ok || !result.ok) {
+    throw new Error(result.message || "No se pudieron cargar los pedidos.");
+  }
+
+  renderOrders(panel, result.orders);
+
 }
 
 async function loadMaintenanceState(panel) {
@@ -282,6 +596,7 @@ export function initAdminPanel() {
   const logoutButton = panel.querySelector("[data-admin-logout]");
   const refreshMetricsButton = panel.querySelector("[data-admin-refresh-metrics]");
   const refreshUsersButton = panel.querySelector("[data-admin-refresh-users]");
+  const refreshOrdersButton = panel.querySelector("[data-admin-refresh-orders]");
   const userForm = panel.querySelector("[data-admin-user-form]");
   const maintenanceToggle = panel.querySelector("[data-maintenance-toggle]");
 
@@ -305,7 +620,11 @@ export function initAdminPanel() {
       });
 
       if (target === "users") {
-        loadUsers(panel).catch((error) => setStatus(panel, error.message));
+          loadUsers(panel).catch((error) => setStatus(panel, error.message));
+      }
+
+      if (target === "orders") {
+          loadOrders(panel).catch((error) => setStatus(panel, error.message));
       }
     });
   });
@@ -402,6 +721,13 @@ export function initAdminPanel() {
       .then(() => setStatus(panel, "Usuarios cargados."))
       .catch((error) => setStatus(panel, error.message));
   });
+  refreshOrdersButton?.addEventListener("click", () => {
+
+      loadOrders(panel)
+          .then(() => setStatus(panel, "Pedidos cargados."))
+          .catch((error) => setStatus(panel, error.message));
+
+  });
 
   userForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -444,4 +770,35 @@ export function initAdminPanel() {
     await fetch("/api/logout", { method: "POST" }).catch(() => {});
     window.location.href = "/login";
   });
+}
+
+closeOrderModal.addEventListener("click", () => {
+    orderModal.classList.add("hidden");
+});
+
+orderModal.addEventListener("click", (e) => {
+
+    if(e.target === orderModal){
+        orderModal.classList.add("hidden");
+    }
+
+});
+
+function showToast(message, type = "success") {
+
+    clearTimeout(toastTimeout);
+
+    toast.className = "toast";
+    toastMessage.textContent = message;
+
+    if (type !== "success") {
+        toast.classList.add(type);
+    }
+
+    toast.classList.remove("hidden");
+
+    toastTimeout = setTimeout(() => {
+        toast.classList.add("hidden");
+    }, 3000);
+
 }
