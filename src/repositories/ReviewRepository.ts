@@ -1,5 +1,5 @@
 import sql from "mssql";
-import { getPool } from "../lib/db"; // Ajusta la ruta
+import { getPool } from "../lib/db";
 
 export class ReviewRepository {
 
@@ -13,9 +13,10 @@ export class ReviewRepository {
                 SELECT TOP 1 1
                 FROM Pedidos p
                 INNER JOIN PedidoProductos pp
-                    ON p.PedidoId = pp.PedidoId
+                    ON p.Id = pp.PedidoId
                 WHERE p.UsuarioId = @UsuarioId
                   AND pp.ProductoId = @ProductoId
+                  AND p.Estado <> 'Cancelado'
             `);
 
         return result.recordset.length > 0;

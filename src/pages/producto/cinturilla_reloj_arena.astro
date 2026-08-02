@@ -187,14 +187,24 @@ const secondaryImages = product.gallery.slice(1);
 				<section class="product-reviews customer-reviews" data-product-reviews={product.id}>
 					<div class="section-heading">
 						<p class="section-kicker">Comentarios</p>
-						<h2>Cuenta tu experiencia</h2>
+						<h2>Opiniones de clientes</h2>
 					</div>
 
+					<div class="review-summary">
+						<div class="review-average">
+							<span class="review-average-stars" data-review-average-stars>☆☆☆☆☆</span>
+							<strong data-review-average>0,0</strong>
+							<span data-review-total>(0 valoraciones)</span>
+						</div>
+					</div>
+
+					<div class="review-grid user-review-grid" data-user-review-list></div>
+
 					<form class="review-form" data-review-form>
-						<!-- <label>
-							<span>Nombre</span>
-							<input name="name" maxlength="60" placeholder="Tu nombre" autocomplete="name" />
-						</label> -->
+						<div class="review-form-heading">
+							<h3>Cuenta tu experiencia</h3>
+							<p class="review-gate" data-review-gate aria-live="polite"></p>
+						</div>
 
 						<fieldset class="rating-field">
 							<legend>Puntuación</legend>
@@ -210,14 +220,12 @@ const secondaryImages = product.gallery.slice(1);
 
 						<label class="review-comment-field">
 							<span>Comentario</span>
-							<textarea name="comment" minlength="8" maxlength="600" rows="4" placeholder="¿Qué te ha parecido este producto?" required></textarea>
+							<textarea name="comment" minlength="8" maxlength="600" rows="5" placeholder="¿Qué te ha parecido este producto?" required></textarea>
 						</label>
 
 						<button class="primary-button" type="submit">Publicar comentario</button>
 						<p class="review-status" data-review-status aria-live="polite"></p>
 					</form>
-
-					<div class="review-grid user-review-grid" data-user-review-list></div>
 				</section>
 
 				{product.faqs.length > 0 && (
