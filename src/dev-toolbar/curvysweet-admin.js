@@ -1277,7 +1277,7 @@ function createWindow() {
 
       <nav class="tabs">
         <button class="active" type="button" data-tab="analytics">Total</button>
-        <button type="button" data-tab="catalog">Catalogo</button>
+        <button type="button" data-tab="catalog">Catálogo</button>
         <button type="button" data-tab="users">Usuarios</button>
         <button type="button" data-tab="site">Sitio</button>
       </nav>
@@ -1296,7 +1296,7 @@ function createWindow() {
 
             <section class="graph-strip">
               <div class="graph-card">
-                <div class="card-title"><span>Mas visto</span><span class="stat-help">?</span></div>
+                <div class="card-title"><span>Más visto</span><span class="stat-help">?</span></div>
                 <div class="bar-list" data-graph-views></div>
               </div>
               <div class="graph-card">
@@ -1430,7 +1430,7 @@ function createWindow() {
           <button class="secondary" type="button" data-refresh-users>Cargar usuarios</button>
           <form class="user-form" data-user-form>
             <label><span>Usuario</span><select name="userId" data-user-select><option value="">Carga usuarios para seleccionar</option></select></label>
-            <label><span>Accion</span><select name="state"><option value="1">Bloquear</option><option value="3">Activar</option></select></label>
+            <label><span>Acción</span><select name="state"><option value="1">Bloquear</option><option value="3">Activar</option></select></label>
             <button class="primary" type="submit">Aplicar</button>
           </form>
           <div class="soft-list" data-user-list></div>
@@ -1439,9 +1439,9 @@ function createWindow() {
 
       <div class="view" data-view="site">
         <section>
-          <h2>Pagina en mantenimiento</h2>
+          <h2>Página en mantenimiento</h2>
           <p class="muted">Los visitantes veran una pantalla de mantenimiento; el admin puede seguir navegando.</p>
-          <label class="switch"><input type="checkbox" data-maintenance /> Pagina en mantenimiento</label>
+          <label class="switch"><input type="checkbox" data-maintenance /> Página en mantenimiento</label>
         </section>
       </div>
 
@@ -1466,7 +1466,7 @@ function hydrate(root) {
       </style>
       <div>
         <h2>CurvySweet Admin</h2>
-        <p>Inicia sesion con el usuario administrador para usar estas herramientas.</p>
+        <p>Inicia sesión con el usuario administrador para usar estas herramientas.</p>
         <a href="/login">Ir al login</a>
       </div>
     `;
@@ -1530,7 +1530,7 @@ function hydrate(root) {
         writeJson(CATALOG_STORAGE_KEY, publishedCatalog);
         syncCatalogInputs(root, publishedCatalog);
         applyCatalogDrafts(publishedCatalog);
-        setStatus(root, "Catalogo publicado. El cambio se mantiene al cerrar sesion.");
+        setStatus(root, "Catálogo publicado. El cambio se mantiene al cerrar sesión.");
       } catch (error) {
         setStatus(root, error.message);
       }
@@ -1616,7 +1616,7 @@ function hydrate(root) {
       return;
     }
 
-    setStatus(root, toggle.checked ? "Pagina en mantenimiento activada." : "Pagina en mantenimiento desactivada.");
+    setStatus(root, toggle.checked ? "Página en mantenimiento activada." : "Página en mantenimiento desactivada.");
   });
 }
 

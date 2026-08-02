@@ -39,15 +39,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     for (const [id, product] of Object.entries(catalog)) {
 
-        await ProductRepository.updateProduct(
-            id,
-            product as {
-                name: string;
-                price: string;
-                image: string;
-                stock: "in" | "out";
-            }
-        );
+    await ProductRepository.updateProduct(
+        id,
+        product as {
+            name: string;
+            price: string;
+            image: string;
+            stock: number;
+            inStock: boolean;
+        }
+    );
+    console.log(product);
 
     }
 

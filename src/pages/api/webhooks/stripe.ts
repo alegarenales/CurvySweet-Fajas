@@ -9,7 +9,7 @@ const stripeWebhookSecret = import.meta.env.STRIPE_WEBHOOK_SECRET;
 
 export const POST: APIRoute = async ({ request }) => {
   if (!stripeSecretKey || !stripeWebhookSecret) {
-    return new Response("Configuracion de Stripe incompleta.", { status: 500 });
+    return new Response("Configuración de Stripe incompleta.", { status: 500 });
   }
 
   const signature = request.headers.get("stripe-signature");
@@ -24,8 +24,8 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     event = stripe.webhooks.constructEvent(payload, signature, stripeWebhookSecret);
   } catch (error) {
-    console.error("Firma de webhook invalida:", error);
-    return new Response("Firma invalida.", { status: 400 });
+    console.error("Firma de webhook inválida:", error);
+    return new Response("Firma inválida.", { status: 400 });
   }
 
 switch (event.type) {
@@ -64,7 +64,7 @@ switch (event.type) {
 
       email: session.customer_details?.email ?? "",
 
-      telefono: session.customer_details?.phone ?? null,
+      teléfono: session.customer_details?.phone ?? null,
 
       importeTotal: (session.amount_total ?? 0) / 100
 

@@ -21,26 +21,32 @@ const createReviewCard = (review) => {
   const card = document.createElement("article");
   card.className = "review-card user-review-card";
 
+  const header = document.createElement("div");
+  header.className = "review-header";
+
   const stars = document.createElement("div");
   stars.className = "review-stars";
-  stars.setAttribute("aria-label", `${review.rating} de 5 estrellas`);
-  stars.textContent = renderStars(review.rating);
+  stars.textContent = renderStars(review.Puntuacion);
+
+  const date = document.createElement("span");
+  date.className = "review-date";
+  date.textContent = formatDate(review.Fecha);
+
+  header.append(stars, date);
 
   const comment = document.createElement("p");
   comment.className = "review-comment";
-  comment.textContent = `"${review.comment}"`;
+  comment.textContent = `"${review.Comentario}"`;
 
   const author = document.createElement("div");
   author.className = "review-author";
 
   const name = document.createElement("strong");
-  name.textContent = review.name || "Cliente";
+  name.textContent = review.Nombre || "Cliente";
 
-  const meta = document.createElement("span");
-  meta.textContent = `Cliente - ${formatDate(review.createdAt)}`;
+  author.append(name);
 
-  author.append(name, meta);
-  card.append(stars, comment, author);
+  card.append(header, comment, author);
 
   return card;
 };
@@ -66,7 +72,7 @@ export function initProductReviews() {
       if (!reviews.length) {
         const empty = document.createElement("p");
         empty.className = "review-empty";
-        empty.textContent = "Todavia no hay comentarios de clientes para este producto.";
+        empty.textContent = "Todavía no hay comentarios de clientes para este producto.";
         list.append(empty);
         return;
       }
@@ -95,10 +101,9 @@ export function initProductReviews() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            productId,
-            name: data.get("name"),
-            rating: Number(data.get("rating")),
-            comment: data.get("comment"),
+              productId,
+              rating: Number(data.get("rating")),
+              comment: data.get("comment"),
           }),
         });
         const result = await response.json();

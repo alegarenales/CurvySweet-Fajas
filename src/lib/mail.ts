@@ -19,7 +19,7 @@ function hasMailConfig() {
 
 export async function sendLoginEmail({ to, name }: WelcomeEmailInput) {
   if (!hasMailConfig()) {
-    console.warn("No se envio el correo de inicio de sesion: faltan variables SMTP en .env");
+    console.warn("No se envío el correo de inicio de sesión: faltan variables SMTP en .env");
     return;
   }
 
@@ -37,7 +37,7 @@ export async function sendLoginEmail({ to, name }: WelcomeEmailInput) {
     from: import.meta.env.SMTP_FROM,
     to,
     subject: "Bienvenida de nuevo a CurvySweet",
-    text: `Nos alegra verte de nuevo, ${name}. Has iniciado sesion correctamente.`,
+    text: `Nos alegra verte de nuevo, ${name}. Has iniciado sesión correctamente.`,
     html: `
       <div style="font-family: Arial, sans-serif; color: #2d1f26; line-height: 1.5;">
         <h1 style="color: #b84b73;">Bienvenida de nuevo a CurvySweet</h1>
@@ -51,7 +51,7 @@ export async function sendLoginEmail({ to, name }: WelcomeEmailInput) {
 
 export async function sendWelcomeEmail({ to, name }: WelcomeEmailInput) {
   if (!hasMailConfig()) {
-    console.warn("No se envio el correo de bienvenida: faltan variables SMTP en .env");
+    console.warn("No se envío el correo de bienvenida: faltan variables SMTP en .env");
     return;
   }
 
@@ -99,7 +99,7 @@ export async function sendPurchaseEmail({
   total,
 }: PurchaseEmailInput) {
   if (!hasMailConfig()) {
-    console.warn("No se envio el correo de compra: faltan variables SMTP en .env");
+    console.warn("No se envío el correo de compra: faltan variables SMTP en .env");
     return;
   }
 

@@ -16,7 +16,7 @@ const { adminEmail } = Astro.props;
   data-admin-panel
   data-admin-email={adminEmail}
   hidden
-  aria-label="Panel de administracion CurvySweet"
+  aria-label="Panel de administración CurvySweet"
 >
   <div class="admin-panel-tab" aria-hidden="true">
     <span>CurvySweet Admin</span>
@@ -29,8 +29,8 @@ const { adminEmail } = Astro.props;
         <strong>{adminEmail}</strong>
       </div>
       <nav class="admin-panel-tabs" aria-label="Secciones del panel">
-        <button type="button" class="is-active" data-admin-tab="catalog">Catalogo</button>
-        <button type="button" data-admin-tab="analytics">Graficas</button>
+        <button type="button" class="is-active" data-admin-tab="catalog">Catálogo</button>
+        <button type="button" data-admin-tab="analytics">Gráficas</button>
         <button type="button" data-admin-tab="users">Usuarios</button>
         <button type="button" data-admin-tab="orders">
             Pedidos
@@ -86,13 +86,27 @@ const { adminEmail } = Astro.props;
                     />
                   </label>
                   <label>
+                    <span>Stock</span>
+
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      name={`${product.id}:stock`}
+                      value={product.stock}
+                      data-admin-quantity-input={product.id}
+                    />
+                  </label>
+                  <label>
                     <span>Estado</span>
+
                     <input
                       type="hidden"
-                      name={`${product.id}:stock`}
+                      name={`${product.id}:inStock`}
                       value={product.inStock ? "in" : "out"}
                       data-admin-stock-input={product.id}
                     />
+
                     <button
                       type="button"
                       class="admin-stock-toggle"
@@ -140,20 +154,20 @@ const { adminEmail } = Astro.props;
     <div class="admin-panel-view" data-admin-view="analytics">
       <section class="admin-tool admin-tool-wide">
         <div class="admin-tool-heading">
-          <h2>Graficas</h2>
+          <h2>Gráficas</h2>
           <button type="button" data-admin-refresh-metrics>Actualizar</button>
         </div>
         <div class="admin-chart-grid">
           <article class="admin-chart-card">
-            <h3>Mas visto</h3>
+            <h3>Más visto</h3>
             <div class="admin-bar-list" data-chart-views></div>
           </article>
           <article class="admin-chart-card">
-            <h3>Mas comprado</h3>
+            <h3>Más comprado</h3>
             <div class="admin-bar-list" data-chart-purchases></div>
           </article>
           <article class="admin-chart-card">
-            <h3>Mas demandado</h3>
+            <h3>Más demandado</h3>
             <div class="admin-bar-list" data-chart-demand></div>
           </article>
         </div>
@@ -174,7 +188,7 @@ const { adminEmail } = Astro.props;
             </select>
           </label>
           <label>
-            <span>Accion</span>
+            <span>Acción</span>
             <select name="state">
               <option value="1">Bloquear</option>
               <option value="3">Activar</option>
@@ -226,10 +240,10 @@ const { adminEmail } = Astro.props;
         <h2>Sitio</h2>
         <label class="admin-switch">
           <input type="checkbox" data-maintenance-toggle />
-          <span>Pagina en mantenimiento</span>
+          <span>Página en mantenimiento</span>
         </label>
         <p class="admin-help-text">
-          Cuando este activo, los visitantes ven una pantalla de mantenimiento. Tu usuario admin puede seguir navegando.
+          Cuando esté activo, los visitantes ven una pantalla de mantenimiento. Tu usuario admin puede seguir navegando.
         </p>
         <a href="/shop">Ver tienda</a>
         <a href="/login">Cambiar usuario</a>

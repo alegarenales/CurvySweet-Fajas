@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
   const repeatPassword = String(data.get("repeatPassword") ?? "");
 
   if (password !== repeatPassword) {
-    return new Response(JSON.stringify({ ok: false, message: "Las contrasenas no coinciden" }), {
+    return new Response(JSON.stringify({ ok: false, message: "Las contraseñas no coinciden" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });

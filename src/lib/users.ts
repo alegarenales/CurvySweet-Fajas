@@ -18,7 +18,7 @@ function getProcedureMessage(recordset: Record<string, unknown>[] = []) {
   const firstRow = recordset[0];
 
   if (!firstRow) {
-    return "No se recibio mensaje del procedimiento.";
+    return "No se recibió mensaje del procedimiento.";
   }
 
   return String(
@@ -53,8 +53,8 @@ export async function loginUsuario({
   const procedureMessage = getProcedureMessage(result.recordset);
   const normalizedMessage = normalizeMessage(procedureMessage);
   const ok = normalizedMessage.includes("usuario logueado correctamente");
-  const message = procedureMessage === "No se recibio mensaje del procedimiento."
-    ? "Email o contrasena incorrectos."
+  const message = procedureMessage === "No se recibió mensaje del procedimiento."
+    ? "Email o contraseña incorrectos."
     : procedureMessage;
 
   return {

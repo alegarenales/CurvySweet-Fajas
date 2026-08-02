@@ -7,7 +7,7 @@ export class OrderRepository {
         usuarioId?: string | null;
         nombre: string;
         email: string;
-        telefono?: string | null;
+        teléfono?: string | null;
         importeTotal: number;
         estado?: string;
     }) {
@@ -19,7 +19,7 @@ export class OrderRepository {
             .input("UsuarioId", data.usuarioId ?? null)
             .input("Nombre", data.nombre)
             .input("Email", data.email)
-            .input("Telefono", data.telefono ?? null)
+            .input("Teléfono", data.teléfono ?? null)
             .input("ImporteTotal", data.importeTotal)
             .input("Estado", data.estado ?? "Pendiente")
             .execute("sp_order_create");

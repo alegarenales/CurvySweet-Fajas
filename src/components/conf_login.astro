@@ -9,7 +9,7 @@ import './CSS/Login.css';
 	<div class="login-layout">
 		<aside class="login-copy">
 			<p class="login-eyebrow">CurvySweet</p>
-			<h1>Inicia sesion de forma sencilla</h1>
+			<h1>Inicia sesión de forma sencilla</h1>
 			<p class="login-description">
 				Un acceso visualmente suave, femenino y actual para que el primer vistazo ya se
 				sienta como marca.
@@ -18,11 +18,11 @@ import './CSS/Login.css';
 			<div class="login-highlights">
 				<div class="highlight-card">
 					<span class="highlight-number">01</span>
-					<p>Nadie puede ver tu contrasena.</p>
+					<p>Nadie puede ver tu contraseña.</p>
 				</div>
 				<div class="highlight-card">
 					<span class="highlight-number">02</span>
-					<p>Campos mas claros, agradables al foco y faciles de recorrer.</p>
+					<p>Campos más claros, agradables al foco y fáciles de recorrer.</p>
 				</div>
 			</div>
 		</aside>
@@ -42,7 +42,7 @@ import './CSS/Login.css';
 						role="tab"
 						aria-selected="true"
 					>
-						Iniciar sesion
+						Iniciar sesión
 					</button>
 					<button
 						type="button"
@@ -83,11 +83,11 @@ import './CSS/Login.css';
 
 					<label class="input-box">
 						<span>Email</span>
-						<input name="mail" type="email" placeholder="correo electronico" required />
+						<input name="mail" type="email" placeholder="correo electrónico" required />
 					</label>
 
 					<label class="input-box">
-						<span>Contrasena</span>
+						<span>Contraseña</span>
 						<input name="password" type="password" placeholder="********" required />
 					</label>
 
@@ -96,7 +96,7 @@ import './CSS/Login.css';
 							<input type="checkbox" />
 							<span>Recordarme</span>
 						</label>
-						<a href="#">Has olvidado tu contrasena?</a>
+						<a href="#">¿Has olvidado tu contraseña?</a>
 					</div>
 
 					<button type="submit" class="btn">Entrar</button>
@@ -104,7 +104,7 @@ import './CSS/Login.css';
 					<p class="form-message" data-login-message aria-live="polite"></p>
 
 					<div class="register-link">
-						<span>Aun no tienes cuenta?</span>
+						<span>¿Aún no tienes cuenta?</span>
 						<button type="button" class="text-link" data-auth-target="register">
 							Crear perfil
 						</button>
@@ -136,23 +136,23 @@ import './CSS/Login.css';
 
 					<label class="input-box">
 						<span>Email</span>
-						<input name="mail" type="email" placeholder="correo electronico" required />
+						<input name="mail" type="email" placeholder="correo electrónico" required />
 					</label>
 
 					<div class="input-grid">
 						<label class="input-box">
-							<span>Contrasena</span>
+							<span>Contraseña</span>
 							<input name="password" type="password" placeholder="********" required />
 						</label>
 						<label class="input-box">
-							<span>Repetir contrasena</span>
+							<span>Repetir contraseña</span>
 							<input name="repeatPassword" type="password" placeholder="********" required />
 						</label>
 					</div>
 
 					<label class="remember-option remember-policy">
 						<input type="checkbox" />
-						<span>Acepto los terminos y la politica de privacidad</span>
+						<span>Acepto los términos y la política de privacidad</span>
 					</label>
 
 					<button type="submit" class="btn">Crear cuenta</button>
@@ -160,9 +160,9 @@ import './CSS/Login.css';
 					<p class="form-message" data-register-message aria-live="polite"></p>
 
 					<div class="register-link">
-						<span>Ya tienes cuenta?</span>
+						<span>¿Ya tienes cuenta?</span>
 						<button type="button" class="text-link" data-auth-target="login">
-							Entrar aqui
+							Entrar aquí
 						</button>
 					</div>
 				</form>
@@ -188,7 +188,7 @@ import './CSS/Login.css';
 
 	const subtitles = {
 		login: 'Introduzca sus datos',
-		register: 'Crea tu cuenta con una transicion suave y visualmente agradable',
+		register: 'Crea tu cuenta con una transición suave y visualmente agradable',
 	};
 
 	const setAuthMode = (mode) => {
@@ -246,7 +246,7 @@ import './CSS/Login.css';
 		const submitButton = loginForm.querySelector('button[type="submit"]');
 		const formData = new FormData(loginForm);
 
-		showLoginMessage('Iniciando sesion...', true);
+		showLoginMessage('Iniciando sesión...', true);
 
 		if (submitButton) {
 			submitButton.disabled = true;
@@ -260,10 +260,10 @@ import './CSS/Login.css';
 			});
 			const result = await response.json().catch(() => ({
 				ok: false,
-				message: 'El servidor no devolvio una respuesta valida.',
+				message: 'El servidor no devolvio una respuesta válida.',
 			}));
 
-			showLoginMessage(result.message ?? 'No se recibio mensaje del servidor.', result.ok);
+			showLoginMessage(result.message ?? 'No se recibió mensaje del servidor.', result.ok);
 
 			if (result.ok) {
 				localStorage.setItem('curvysweetUser', JSON.stringify(result.user));
@@ -274,7 +274,7 @@ import './CSS/Login.css';
 			}
 		} catch (error) {
 			console.error(error);
-			showLoginMessage('No se pudo iniciar sesion.', false);
+			showLoginMessage('No se pudo iniciar sesión.', false);
 		} finally {
 			if (submitButton) {
 				submitButton.disabled = false;
@@ -301,7 +301,7 @@ import './CSS/Login.css';
 			});
 			const result = await response.json();
 
-			showRegisterMessage(result.message ?? 'No se recibio mensaje del servidor.', result.ok);
+			showRegisterMessage(result.message ?? 'No se recibió mensaje del servidor.', result.ok);
 
 			if (result.ok) {
 				localStorage.setItem('curvysweetUser', JSON.stringify(result.user));

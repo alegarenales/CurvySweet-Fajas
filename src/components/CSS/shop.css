@@ -689,3 +689,36 @@ body {
 		opacity: 0;
 	}
 }
+
+.product-card-actions{
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+}
+
+.favorite-button{
+    width:34px;
+    height:34px;
+
+    border:none;
+    border-radius:50%;
+
+    background:white;
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:1.2rem;
+
+    transition:.2s;
+}
+
+.favorite-button:hover{
+    transform:scale(1.1);
+}
+
+.favorite-button.is-favorite{
+    color:#ff2b73;
+}

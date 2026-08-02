@@ -83,7 +83,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const state = Number(data.get("state") ?? 1);
 
   if (!userId || ![1, 3].includes(state)) {
-    return new Response(JSON.stringify({ ok: false, message: "Seleccion invalida." }), {
+    return new Response(JSON.stringify({ ok: false, message: "Seleccion inválida." }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });

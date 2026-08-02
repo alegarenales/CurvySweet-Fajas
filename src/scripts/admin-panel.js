@@ -1,4 +1,3 @@
-// const CATALOG_STORAGE_KEY = "curvysweetAdminCatalogDrafts";
 const PRODUCT_STORAGE_KEY = "curvysweetAdminProductDrafts";
 const USER_STORAGE_KEY = "curvysweetUser";
 const orderModal = document.getElementById("order-modal");
@@ -31,68 +30,6 @@ function setStatus(panel, message) {
     status.textContent = message;
   }
 }
-
-// function applyCatalogDrafts(catalogDrafts) {
-//   Object.entries(catalogDrafts).forEach(([productId, productDraft]) => {
-//     if (productDraft.price) {
-//       document.querySelectorAll(`[data-product-price="${productId}"]`).forEach((priceElement) => {
-//         priceElement.textContent = productDraft.price;
-//       });
-//     }
-
-//     if (productDraft.name) {
-//       document.querySelectorAll(`[data-product-name="${productId}"]`).forEach((nameElement) => {
-//         nameElement.textContent = productDraft.name;
-//       });
-//     }
-
-//     if (productDraft.image) {
-//       document.querySelectorAll(`[data-product-image="${productId}"]`).forEach((imageElement) => {
-//         if (imageElement instanceof HTMLImageElement) {
-//           imageElement.src = productDraft.image;
-//         } else {
-//           imageElement.style.backgroundImage = `url('${productDraft.image}')`;
-//         }
-//       });
-//     }
-
-//     if (productDraft.stock) {
-//       const inStock = productDraft.stock === "in";
-
-//       document.querySelectorAll(`[data-product-stock="${productId}"]`).forEach((stockElement) => {
-//         stockElement.classList.toggle("is-in-stock", inStock);
-//         stockElement.classList.toggle("is-out-of-stock", !inStock);
-//         stockElement.setAttribute("aria-label", inStock ? "Producto en stock" : "Producto sin stock");
-//         stockElement.setAttribute("title", inStock ? "Producto en stock" : "Producto sin stock");
-
-//         const stockText = stockElement.querySelector("[data-stock-text]") ?? stockElement.querySelector(".stock-text") ?? stockElement.querySelector("span:last-child");
-//         if (stockText) {
-//           stockText.textContent = inStock ? "En stock" : "Sin stock";
-//         }
-//       });
-
-//       document.querySelectorAll(`[data-product-id="${productId}"]`).forEach((element) => {
-//         if ("inStock" in element.dataset) {
-//           element.dataset.inStock = String(inStock);
-//         }
-//       });
-//     }
-//   });
-// }
-
-// async function loadCatalogDrafts(panel) {
-//   const response = await fetch("/api/admin/catalog");
-//   const result = await response.json();
-
-//   if (!response.ok || !result.ok) {
-//     throw new Error(result.message || "No se pudo cargar el catalogo publicado.");
-//   }
-
-//   writeJson(CATALOG_STORAGE_KEY, result.catalog);
-//   syncCatalogInputs(panel, result.catalog);
-//   applyCatalogDrafts(result.catalog);
-// }
-
 async function publishCatalogDrafts(catalog) {
   const response = await fetch("/api/admin/catalog", {
     method: "POST",
@@ -102,33 +39,11 @@ async function publishCatalogDrafts(catalog) {
   const result = await response.json();
 
   if (!response.ok || !result.ok) {
-    throw new Error(result.message || "No se pudo publicar el catalogo.");
+    throw new Error(result.message || "No se pudo publicar el catálogo.");
   }
 
   return catalog;
 }
-
-// function syncCatalogInputs(panel, catalogDrafts) {
-//   Object.entries(catalogDrafts).forEach(([productId, productDraft]) => {
-//     const nameInput = panel.querySelector(`[data-admin-name-input="${productId}"]`);
-//     const priceInput = panel.querySelector(`[data-admin-price-input="${productId}"]`);
-//     const imageInput = panel.querySelector(`[data-admin-image-input="${productId}"]`);
-//     const stockInput = panel.querySelector(`[data-admin-stock-input="${productId}"]`);
-//     const imagePreview = panel.querySelector(`[data-admin-image-preview="${productId}"]`);
-
-//     if (nameInput && productDraft.name) nameInput.value = productDraft.name;
-//     if (priceInput && productDraft.price) priceInput.value = productDraft.price;
-//     if (imageInput && productDraft.image) {
-//       imageInput.value = productDraft.image;
-//       if (imagePreview) {
-//         imagePreview.style.backgroundImage = `url('${productDraft.image}')`;
-//       }
-//     }
-//     if (stockInput && productDraft.stock) {
-//       setStockToggleState(panel, productId, productDraft.stock);
-//     }
-//   });
-// }
 
 function setStockToggleState(panel, productId, stock) {
   const nextStock = stock === "out" ? "out" : "in";
@@ -211,7 +126,7 @@ async function loadMetrics(panel) {
   const result = await response.json();
 
   if (!response.ok || !result.ok) {
-    throw new Error(result.message || "No se pudieron cargar las graficas.");
+    throw new Error(result.message || "No se pudieron cargar las gráficas.");
   }
 
   renderChart(panel.querySelector("[data-chart-views]"), result.views, "is-red");
@@ -637,6 +552,44 @@ export function initAdminPanel() {
       setStockToggleState(panel, productId, nextStock);
     });
   });
+  panel.querySelectorAll("[data-admin-quantity-input]").forEach((input) => {
+
+      input.addEventListener("input", () => {
+
+          const productId = input.dataset.adminQuantityInput;
+
+          const stockInput = panel.querySelector(
+              `[data-admin-stock-input="${productId}"]`
+          );
+
+          const toggle = panel.querySelector(
+              `[data-admin-stock-toggle="${productId}"]`
+          );
+
+          const inStock = Number(input.value) > 0;
+
+          stockInput.value = inStock ? "in" : "out";
+
+          toggle.dataset.stockState = inStock ? "in" : "out";
+          toggle.setAttribute("aria-pressed", String(inStock));
+          toggle.textContent = inStock ? "En stock" : "Sin stock";
+
+      });
+
+  });
+  panel.querySelectorAll("[data-admin-quantity-input]").forEach((input) => {
+      input.addEventListener("input", () => {
+          const productId = input.dataset.adminQuantityInput;
+
+          const stock = Number(input.value);
+
+          setStockToggleState(
+              panel,
+              productId,
+              stock > 0 ? "in" : "out"
+          );
+      });
+  });
 
   panel.querySelectorAll("[data-admin-image-input]").forEach((input) => {
     input.addEventListener("input", () => {
@@ -666,6 +619,10 @@ export function initAdminPanel() {
         ...nextCatalog[productId],
         [field]: String(value),
       };
+    });
+    Object.values(nextCatalog).forEach((product) => {
+      product.stock = Number(product.stock);
+      product.inStock = product.inStock === "in";
     });
 
     try {
@@ -712,7 +669,7 @@ export function initAdminPanel() {
 
   refreshMetricsButton?.addEventListener("click", () => {
     loadMetrics(panel)
-      .then(() => setStatus(panel, "Graficas actualizadas."))
+      .then(() => setStatus(panel, "Gráficas actualizadas."))
       .catch((error) => setStatus(panel, error.message));
   });
 
@@ -762,7 +719,7 @@ export function initAdminPanel() {
       return;
     }
 
-    setStatus(panel, maintenanceToggle.checked ? "Pagina en mantenimiento activada." : "Pagina en mantenimiento desactivada.");
+    setStatus(panel, maintenanceToggle.checked ? "Página en mantenimiento activada." : "Página en mantenimiento desactivada.");
   });
 
   logoutButton?.addEventListener("click", async () => {

@@ -83,15 +83,15 @@ export async function addProductReview(rawReview: {
   const comment = cleanText(rawReview.comment, 600);
 
   if (!(await isValidProductId(productId))) {
-    throw new Error("Producto no valido.");
+    throw new Error("Producto no válido.");
   }
 
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    throw new Error("Elige una puntuacion del 1 al 5.");
+    throw new Error("Elige una puntuación del 1 al 5.");
   }
 
   if (comment.length < 8) {
-    throw new Error("Escribe un comentario un poco mas completo.");
+    throw new Error("Escribe un comentario un poco más completo.");
   }
 
   const reviews = readProductReviews();

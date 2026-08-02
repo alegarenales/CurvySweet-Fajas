@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ url }) => {
   const sessionId = url.searchParams.get("session_id")?.trim();
 
   if (!stripeSecretKey || !sessionId || !sessionId.startsWith("cs_")) {
-    return json({ ok: false, message: "Sesion de pago invalida." }, 400);
+    return json({ ok: false, message: "Sesion de pago inválida." }, 400);
   }
 
   try {
@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ url }) => {
       },
     });
   } catch (error) {
-    console.error("No se pudo verificar la sesion de Stripe:", error);
+    console.error("No se pudo verificar la sesión de Stripe:", error);
     return json({ ok: false, message: "No se pudo verificar el pedido." }, 404);
   }
 };

@@ -1,7 +1,6 @@
 ---
 import CartDrawer from './CartDrawer.astro';
 import './CSS/shop.css';
-// const products = getProducts();
 import { ProductRepository } from '../repositories/ProductRepository';
 const products = await ProductRepository.getProducts();
 ---
@@ -9,7 +8,7 @@ const products = await ProductRepository.getProducts();
 	<div class="shop-header">
 		<p class="shop-kicker">CurvySweet</p>
 		<h2>Tienda</h2>
-		<p class="shop-subtitle">Descubre nuestras piezas mas vendidas para realzar tu figura.</p>
+		<p class="shop-subtitle">Descubre nuestras piezas más vendidas para realzar tu figura.</p>
 	</div>
 
 	<div class="shop-grid">
@@ -27,17 +26,33 @@ const products = await ProductRepository.getProducts();
 				>
 					<div class="product-card-top">
 						<span class="product-tag">{product.tag}</span>
-						<span
-							class={`stock-indicator ${product.inStock ? 'is-in-stock' : 'is-out-of-stock'}`}
-							data-product-stock={product.id}
-							aria-label={product.inStock ? 'Producto en stock' : 'Producto sin stock'}
-							title={product.inStock ? 'Producto en stock' : 'Producto sin stock'}
-						>
-							<span class="stock-dot" aria-hidden="true"></span>
-							<span class="stock-text" data-stock-text>
-								{product.inStock ? 'En stock' : 'Sin stock'}
+
+						<div class="product-card-actions">
+
+							<button
+								type="button"
+								class="favorite-button"
+								data-favorite-button
+								data-product-id={product.id}
+								onclick="console.log('CLICK HTML')"
+								aria-label="Añadir a favoritos"
+							>
+								♡
+							</button>
+
+							<span
+								class={`stock-indicator ${product.inStock ? 'is-in-stock' : 'is-out-of-stock'}`}
+								data-product-stock={product.id}
+								aria-label={product.inStock ? 'Producto en stock' : 'Producto sin stock'}
+								title={product.inStock ? 'Producto en stock' : 'Producto sin stock'}
+							>
+								<span class="stock-dot"></span>
+								<span class="stock-text" data-stock-text>
+									{product.inStock ? 'En stock' : 'Sin stock'}
+								</span>
 							</span>
-						</span>
+
+						</div>
 					</div>
 					<div
 						class="product-image"
@@ -66,7 +81,7 @@ const products = await ProductRepository.getProducts();
                             data-product-id={product.id}
                             data-in-stock={product.inStock}
 						>
-							Anadir al carrito
+							Añadir al carrito
 						</button>
 					</div>
 				</article>
@@ -81,30 +96,13 @@ const products = await ProductRepository.getProducts();
 			<button id="btnClose" class="popup-close" type="button">Entendido</button>
 		</div>
 	</div>
-	<!-- <div class="checkout-legal">
-		<label for="legal-consent">
-			<input id="legal-consent" type="checkbox" />
-			<span>
-				Acepto los
-				<a href="/legal/terminos" target="_blank" rel="noopener noreferrer">Terminos</a>,
-				<a href="/legal/privacidad" target="_blank" rel="noopener noreferrer">Privacidad</a>
-				y
-				<a href="/legal/reembolsos" target="_blank" rel="noopener noreferrer">Reembolsos</a>.
-			</span>
-		</label>
-	</div> -->
 </section>
 <CartDrawer />
 
 <script>
-// import { initBarMenuScroll } from '../scripts/bar-menu-scroll.js';
-// import { initThemeToggle } from '../scripts/theme-toggle.js';
-// import { initMenuToggle } from '../scripts/menu-toggle.js';
 const imageRotators = new WeakMap();
 
 window.handleProductCardClick = (event) => {
-    // Si se ha pulsado un botón o elemento del carrito,
-    // no abrir la página del producto.
     if (event.target.closest('[data-cart-add]')) {
         return;
     }
@@ -201,8 +199,73 @@ document.querySelectorAll('.product-image').forEach((imageElement) => {
         resetProductRotator(imageElement);
     });
 });
+async function loadFavorites() {
 
-// initBarMenuScroll();
-// initThemeToggle();
-// initMenuToggle();
+    const response = await fetch("/api/favorites");
+
+    if (!response.ok) return;
+
+    const favorites = await response.json();
+
+    const ids = new Set(
+        favorites.map(f => f.ProductoId)
+    );
+
+    document
+        .querySelectorAll("[data-favorite-button]")
+        .forEach(button => {
+
+            if (ids.has(button.dataset.productId)) {
+                button.classList.add("is-favorite");
+                button.textContent = "♥";
+            }
+
+        });
+
+}
+
+loadFavorites();
+
+const buttons = document.querySelectorAll("[data-favorite-button]");
+
+console.log("BOTONES ENCONTRADOS:", buttons.length);
+
+buttons.forEach((button) => {
+
+    button.addEventListener("click", async (e) => {
+
+        console.log("CLICK EN FAVORITO");
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const productId = button.dataset.productId;
+        const favorite = button.classList.contains("is-favorite");
+
+        console.log({ productId, favorite });
+
+        const response = await fetch("/api/favorites", {
+            method: favorite ? "DELETE" : "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ productId })
+        });
+
+        console.log("STATUS:", response.status);
+
+        if (!response.ok) {
+            console.error("Error llamando a la API");
+            return;
+        }
+
+        button.classList.toggle("is-favorite");
+        button.textContent = button.classList.contains("is-favorite")
+            ? "♥"
+            : "♡";
+
+    });
+
+});
+
 </script>

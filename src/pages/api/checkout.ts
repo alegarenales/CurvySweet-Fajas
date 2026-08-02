@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     body = await request.json();
   } catch {
-    return jsonResponse(400, { error: "Body invalido." });
+    return jsonResponse(400, { error: "Body inválido." });
   }
 
   const requestedItems = Array.isArray(body.items) && body.items.length
@@ -94,7 +94,7 @@ const lineItems = await Promise.all(
     }
 
     return jsonResponse(400, {
-      error: "Hay productos invalidos, sin stock o no configurados para pagos.",
+      error: "Hay productos inválidos, sin stock o no configurados para pagos.",
       invalidProducts: invalid.join(","),
     });
   }

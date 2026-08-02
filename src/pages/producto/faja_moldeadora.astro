@@ -9,7 +9,7 @@ import BarMenu from '../../components/BarMenu.astro';
 const product = await getProductPageById('faja_moldeadora');
 
 if (!product) {
-	throw new Error('No se encontro la informacion del producto faja_moldeadora');
+	throw new Error('No se encontro la información del producto faja_moldeadora');
 }
 
 const relatedProducts = await getRelatedProducts(product.id);
@@ -81,7 +81,7 @@ const secondaryImages = product.gallery.slice(1);
 						</div>
 
 						<div class="product-actions">
-							<button type="button" class="primary-button" data-cart-add data-product-id={product.id} data-in-stock={product.inStock}>Anadir al carrito</button>
+							<button type="button" class="primary-button" data-cart-add data-product-id={product.id} data-in-stock={product.inStock}>Añadir al carrito</button>
 							<a class="secondary-button" href="/shop">Seguir comprando</a>
 						</div>
 
@@ -127,7 +127,7 @@ const secondaryImages = product.gallery.slice(1);
 
 				<section class="product-info-grid">
 					<article class="info-card info-card-wide">
-						<p class="section-kicker">Descripcion</p>
+						<p class="section-kicker">Descripción</p>
 						<h2>Una ficha escalable basada en datos</h2>
 						<p>{product.longDescription}</p>
 
@@ -138,7 +138,7 @@ const secondaryImages = product.gallery.slice(1);
 
 					<article class="info-card">
 						<p class="section-kicker">Detalles</p>
-						<h2>Caracteristicas destacadas</h2>
+						<h2>Características destacadas</h2>
 						<div class="feature-list">
 							{
 								product.features.map((feature) => (
@@ -153,7 +153,7 @@ const secondaryImages = product.gallery.slice(1);
 
 					<article class="info-card">
 						<p class="section-kicker">Cuidado</p>
-						<h2>Como mantenerla mejor</h2>
+						<h2>Cómo mantenerla mejor</h2>
 						<ul class="plain-list">
 							{product.care.map((item) => <li>{item}</li>)}
 						</ul>
@@ -163,7 +163,7 @@ const secondaryImages = product.gallery.slice(1);
 				{product.reviews.length > 0 && (
 					<section class="product-reviews">
 						<div class="section-heading">
-							<p class="section-kicker">Resenas</p>
+							<p class="section-kicker">Reseñas</p>
 							<h2>Lo que transmite al usarla</h2>
 						</div>
 
@@ -190,13 +190,13 @@ const secondaryImages = product.gallery.slice(1);
 					</div>
 
 					<form class="review-form" data-review-form>
-						<label>
+						<!-- <label>
 							<span>Nombre</span>
 							<input name="name" maxlength="60" placeholder="Tu nombre" autocomplete="name" />
-						</label>
+						</label> -->
 
 						<fieldset class="rating-field">
-							<legend>Puntuacion</legend>
+							<legend>Puntuación</legend>
 							<div class="rating-options">
 								{[5, 4, 3, 2, 1].map((rating) => (
 									<label>
@@ -209,7 +209,7 @@ const secondaryImages = product.gallery.slice(1);
 
 						<label class="review-comment-field">
 							<span>Comentario</span>
-							<textarea name="comment" minlength="8" maxlength="600" rows="4" placeholder="Que te ha parecido este producto?" required></textarea>
+							<textarea name="comment" minlength="8" maxlength="600" rows="4" placeholder="¿Qué te ha parecido este producto?" required></textarea>
 						</label>
 
 						<button class="primary-button" type="submit">Publicar comentario</button>
@@ -223,7 +223,7 @@ const secondaryImages = product.gallery.slice(1);
 					<section class="product-faqs">
 						<div class="section-heading">
 							<p class="section-kicker">Preguntas frecuentes</p>
-							<h2>Informacion rapida antes de comprar</h2>
+							<h2>Información rápida antes de comprar</h2>
 						</div>
 
 						<div class="faq-list">
@@ -242,8 +242,8 @@ const secondaryImages = product.gallery.slice(1);
 				{relatedProducts.length > 0 && (
 					<section class="related-products">
 						<div class="section-heading">
-							<p class="section-kicker">Tambien te puede gustar</p>
-							<h2>Mas opciones dentro de la tienda</h2>
+							<p class="section-kicker">También te puede gustar</p>
+							<h2>Más opciones dentro de la tienda</h2>
 						</div>
 
 						<div class="related-grid">
@@ -273,7 +273,7 @@ const secondaryImages = product.gallery.slice(1);
 		</div>
 		<div class="product-lightbox" data-product-lightbox hidden>
 			<div class="product-lightbox-backdrop" data-lightbox-close></div>
-			<div class="product-lightbox-dialog" role="dialog" aria-modal="true" aria-label={`Galeria de ${product.name}`}>
+			<div class="product-lightbox-dialog" role="dialog" aria-modal="true" aria-label={`Galería de ${product.name}`}>
 				<button class="lightbox-close" type="button" data-lightbox-close aria-label="Cerrar visor">x</button>
 				<button class="lightbox-nav lightbox-prev" type="button" data-lightbox-prev aria-label="Imagen anterior">‹</button>
 				<div class="lightbox-stage">

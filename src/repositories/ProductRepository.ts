@@ -24,14 +24,15 @@ export class ProductRepository {
             return {
                 id: product.Id,
                 name: product.Nombre,
-                description: product.Descripcion,
+                description: product.Descripción,
                 displayPrice: `${Number(product.Precio)} EUR`,
                 image: images[0] ?? "",
                 images,
                 stripePriceId: product.StripePriceId,
                 tag: product.Etiqueta,
                 inStock: Boolean(product.EnStock),
-                link: product.Link
+                link: product.Link,
+                stock: Number(product.Stock)
             };
 
         });
@@ -52,7 +53,8 @@ export class ProductRepository {
             name: string;
             price: string;
             image: string;
-            stock: "in" | "out";
+            stock: number;
+            inStock: boolean;
         }
     ) {
 
@@ -75,7 +77,8 @@ export class ProductRepository {
             .input("Id", id)
             .input("Nombre", data.name)
             .input("Precio", price)
-            .input("EnStock", data.stock === "in")
+            .input("Stock", data.stock)
+            .input("EnStock", data.inStock)
             .execute("sp_product_update");
 
         console.log("ReturnValue:", result.returnValue);

@@ -45,35 +45,35 @@ const normalizeImagePath = (path?: string) => {
 
 const productContentMap: Record<string, ProductContent> = {
 	faja_chaleco_cinturilla: {
-		heroLabel: 'Compresion media - alta',
+		heroLabel: 'Compresión media - alta',
 		headline: 'Faja chaleco cinturilla para estilizar con soporte y comodidad.',
 		intro:
-			'Una prenda pensada para abrazar el torso, definir la silueta y mantener una sensacion de ajuste agradable durante el dia.',
+			'Una prenda pensada para abrazar el torso, definir la silueta y mantener una sensación de ajuste agradable durante el día.',
 		longDescription:
-			'Esta faja chaleco cinturilla combina estructura y suavidad para que puedas realzar cintura, abdomen y espalda sin renunciar a la comodidad visual y corporal. Su diseno busca ofrecer una base firme para looks diarios o momentos especiales.',
+			'Esta faja chaleco cinturilla combina estructura y suavidad para que puedas realzar cintura, abdomen y espalda sin renunciar a la comodidad visual y corporal. Su diseño busca ofrecer una base firme para looks diarios o momentos especiales.',
 		benefits: [
-			'Define cintura y abdomen con una compresion visualmente equilibrada.',
-			'Aporta sensacion de soporte en espalda media y alta.',
-			'Se adapta bien a rutinas diarias y estilismos mas ajustados.',
+			'Define cintura y abdomen con una compresión visualmente equilibrada.',
+			'Aporta sensación de soporte en espalda media y alta.',
+			'Se adapta bien a rutinas diarias y estilismos más ajustados.',
 		],
 		features: [
 			{
 				title: 'Moldeo uniforme',
-				description: 'Distribuye la compresion para estilizar la silueta de forma armoniosa.',
+				description: 'Distribuye la compresión para estilizar la silueta de forma armoniosa.',
 			},
 			{
-				title: 'Ajuste comodo',
+				title: 'Ajuste cómodo',
 				description: 'Pensada para sentirse firme sin endurecer la experiencia de uso.',
 			},
 			{
-				title: 'Diseno versatil',
-				description: 'Funciona como capa interior para looks cotidianos o prendas mas cenidas.',
+				title: 'Diseño versátil',
+				description: 'Funciona como capa interior para looks cotidianos o prendas más ceñidas.',
 			},
 		],
 		sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
 		colors: ['Negro'],
 		care: [
-			'Lavar a mano con agua fria.',
+			'Lavar a mano con agua fría.',
 			'No usar secadora.',
 			'Secar a la sombra para conservar elasticidad y forma.',
 		],
@@ -86,7 +86,7 @@ const productContentMap: Record<string, ProductContent> = {
 			{
 				author: 'Laura M.',
 				role: 'Cliente verificada',
-				comment: 'Se siente firme, bonita y mucho mas comoda de lo que esperaba.',
+				comment: 'Se siente firme, bonita y mucho más cómoda de lo que esperaba.',
 			},
 			{
 				author: 'Paula R.',
@@ -96,12 +96,12 @@ const productContentMap: Record<string, ProductContent> = {
 		],
 		faqs: [
 			{
-				question: 'Se puede usar varias horas seguidas?',
-				answer: 'Si, esta planteada para un uso progresivo y comodo dentro de tu rutina.',
+				question: '¿Se puede usar varias horas seguidas?',
+				answer: 'Sí, esta planteada para un uso progresivo y cómodo dentro de tu rutina.',
 			},
 			{
-				question: 'Sirve para llevar debajo de vestidos o camisetas ajustadas?',
-				answer: 'Si, su perfil esta pensado para acompanar prendas mas cenidas.',
+				question: '¿Sirve para llevar debajo de vestidos o camisetas ajustadas?',
+				answer: 'Sí, su perfil esta pensado para acompañar prendas más ceñidas.',
 			},
 		],
 		relatedProductIds: ['cinturilla_reloj_arena', 'faja_latex'],
@@ -110,22 +110,22 @@ const productContentMap: Record<string, ProductContent> = {
 		heroLabel: 'Silueta reloj de arena',
 		headline: 'Una cinturilla pensada para remarcar cintura con presencia.',
 		intro:
-			'Ideal para quienes buscan una prenda mas centrada en la zona media y un look estilizado.',
+			'Ideal para quienes buscan una prenda más centrada en la zona media y un look estilizado.',
 		longDescription:
-			'Su estructura prioriza la definicion de cintura y una presencia visual mas marcada, manteniendo una estetica limpia y facil de integrar en el catalogo.',
+			'Su estructura prioriza la definición de cintura y una presencia visual más marcada, manteniendo una estética limpia y fácil de integrar en el catálogo.',
 		benefits: [
-			'Enfatiza la cintura de forma mas directa.',
-			'Facil de combinar bajo prendas de uso diario.',
-			'Base lista para ampliar informacion cuando este producto crezca.',
+			'Enfatiza la cintura de forma más directa.',
+			'Fácil de combinar bajo prendas de uso diario.',
+			'Base lista para ampliar información cuando este producto crezca.',
 		],
 		features: [
 			{
 				title: 'Enfoque en cintura',
-				description: 'Compresion orientada a remarcar la zona central.',
+				description: 'Compresión orientada a remarcar la zona central.',
 			},
 			{
 				title: 'Ajuste por niveles',
-				description: 'Permite adaptar la sensacion de firmeza segun el momento de uso.',
+				description: 'Permite adaptar la sensación de firmeza según el momento de uso.',
 			},
 			{
 				title: 'Perfil discreto',
@@ -135,8 +135,8 @@ const productContentMap: Record<string, ProductContent> = {
 		sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
 		colors: ['Negro'],
 		care: [
-			'Lavar a mano con agua fria.',
-			'No usar lejia ni secadora.',
+			'Lavar a mano con agua fría.',
+			'No usar lejía ni secadora.',
 			'Guardar cerrada para conservar la forma de los broches.',
 		],
 		gallery: [
@@ -153,19 +153,19 @@ const productContentMap: Record<string, ProductContent> = {
 				comment: 'Me ayuda a marcar la cintura y se mantiene bien en su sitio.',
 			},
 			{
-				author: 'Claudia S.',
+				author: 'Claudía S.',
 				role: 'Compra online',
 				comment: 'La uso debajo de vestidos y queda bastante discreta.',
 			},
 		],
 		faqs: [
 			{
-				question: 'Que talla debo elegir si estoy entre dos tallas?',
-				answer: 'Si buscas comodidad diaria, elige la talla superior. Si prefieres mas firmeza, revisa bien la tabla antes de elegir.',
+				question: '¿Qué talla debo elegir si estoy entre dos tallas?',
+				answer: 'Si buscas comodidad diaria, elige la talla superior. Si prefieres más firmeza, revisa bien la tabla antes de elegir.',
 			},
 			{
-				question: 'Es adecuada para uso diario?',
-				answer: 'Si, recomendamos empezar con pocas horas y aumentar el tiempo segun tu comodidad.',
+				question: '¿Es adecuada para uso diario?',
+				answer: 'Sí, recomendamos empezar con pocas horas y aumentar el tiempo según tu comodidad.',
 			},
 		],
 		relatedProductIds: ['faja_chaleco_cinturilla', 'faja_latex'],
@@ -173,8 +173,8 @@ const productContentMap: Record<string, ProductContent> = {
 	faja_control_abdominal:{
 		heroLabel: 'Control abdominal',
 		headline: 'Faja moldeadora reductora para una silueta firme y definida.',
-		intro: 'Disenada para aportar soporte en abdomen, cintura y espalda con una compresion estable.',
-		longDescription: 'La faja moldeadora reductora ofrece una sensacion de control mas envolvente para looks ajustados o momentos en los que buscas una base firme. Su estructura ayuda a suavizar visualmente la zona media y acompana el movimiento con un ajuste seguro.',
+		intro: 'Diseñada para aportar soporte en abdomen, cintura y espalda con una compresión estable.',
+		longDescription: 'La faja moldeadora reductora ofrece una sensación de control más envolvente para looks ajustados o momentos en los que buscas una base firme. Su estructura ayuda a suavizar visualmente la zona media y acompaña el movimiento con un ajuste seguro.',
 		benefits: [
 			'Ayuda a suavizar visualmente abdomen y cintura.',
 			'Ofrece soporte firme sin perder movilidad.',
@@ -182,22 +182,22 @@ const productContentMap: Record<string, ProductContent> = {
 		],
 		features: [
 			{
-				title: 'Compresion firme',
+				title: 'Compresión firme',
 				description: 'Pensada para un ajuste estable en la zona abdominal.',
 			},
 			{
 				title: 'Cobertura completa',
-				description: 'Acompana cintura, abdomen y espalda baja para una linea mas continua.',
+				description: 'Acompaña cintura, abdomen y espalda baja para una línea más continua.',
 			},
 			{
-				title: 'Acabado versatil',
+				title: 'Acabado versátil',
 				description: 'Se integra bajo vestidos, pantalones y prendas de uso diario.',
 			},
 		],
 		sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
 		colors: ['Negro'],
 		care: [
-			'Lavar a mano con agua fria.',
+			'Lavar a mano con agua fría.',
 			'No planchar.',
 			'Secar en plano o colgada a la sombra.',
 		],
@@ -215,52 +215,52 @@ const productContentMap: Record<string, ProductContent> = {
 				comment: 'Tiene buen soporte en abdomen y queda muy bien debajo de ropa ajustada.',
 			},
 			{
-				author: 'Rocio L.',
+				author: 'Rocío L.',
 				role: 'Compra recurrente',
-				comment: 'La compresion se siente firme, pero no me limita al moverme.',
+				comment: 'La compresión se siente firme, pero no me limita al moverme.',
 			},
 		],
 		faqs: [
 			{
-				question: 'Esta faja esta disponible ahora?',
+				question: '¿Esta faja está disponible ahora?',
 				answer: 'Actualmente aparece sin stock en la tienda; puedes revisar la ficha para ver sus detalles mientras vuelve a estar disponible.',
 			},
 			{
-				question: 'Que tipo de compresion ofrece?',
-				answer: 'Esta pensada para una compresion firme, especialmente enfocada en abdomen y cintura.',
+				question: '¿Qué tipo de compresión ofrece?',
+				answer: 'Está pensada para una compresión firme, especialmente enfocada en abdomen y cintura.',
 			},
 		],
 		relatedProductIds: ['faja_chaleco_cinturilla', 'cinturilla_reloj_arena'],
 	},
 	faja_latex:{
 		heroLabel: 'Latex y ajuste flexible',
-		headline: 'Faja de latex para moldear con firmeza y acabado limpio.',
-		intro: 'Una opcion clasica para definir la zona media con una sensacion elastica y segura.',
-		longDescription: 'La faja de latex combina elasticidad y soporte para acompanar la silueta con un ajuste cenido. Es una pieza pensada para quienes buscan una prenda firme, facil de combinar y con presencia discreta bajo la ropa.',
+		headline: 'Faja de látex para moldear con firmeza y acabado limpio.',
+		intro: 'Una opción clásica para definir la zona media con una sensación elástica y segura.',
+		longDescription: 'La faja de látex combina elasticidad y soporte para acompañar la silueta con un ajuste cenido. Es una pieza pensada para quienes buscan una prenda firme, fácil de combinar y con presencia discreta bajo la ropa.',
 		benefits: [
-			'Moldea cintura y abdomen con sensacion elastica.',
+			'Moldea cintura y abdomen con sensación elástica.',
 			'Aporta soporte sin sumar demasiado volumen.',
 			'Funciona bien como prenda interior para looks diarios.',
 		],
 		features: [
 			{
-				title: 'Material elastico',
-				description: 'El latex ayuda a mantener un ajuste firme y flexible.',
+				title: 'Material elástico',
+				description: 'El látex ayuda a mantener un ajuste firme y flexible.',
 			},
 			{
-				title: 'Diseno ajustado',
-				description: 'Se adapta al contorno para una apariencia mas estilizada.',
+				title: 'Diseño ajustado',
+				description: 'Se adapta al contorno para una apariencia más estilizada.',
 			},
 			{
-				title: 'Uso versatil',
+				title: 'Uso versátil',
 				description: 'Adecuada para combinar con diferentes prendas y rutinas.',
 			},
 		],
 		sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
 		colors: ['Negro'],
 		care: [
-			'Lavar a mano con jabon suave.',
-			'Evitar calor directo para proteger el latex.',
+			'Lavar a mano con jabón suave.',
+			'Evitar calor directo para proteger el látex.',
 			'Secar completamente antes de guardar.',
 		],
 		gallery: [
@@ -277,17 +277,17 @@ const productContentMap: Record<string, ProductContent> = {
 			{
 				author: 'Elena C.',
 				role: 'Compra online',
-				comment: 'Buena opcion para marcar cintura en conjuntos ajustados.',
+				comment: 'Buena opción para marcar cintura en conjuntos ajustados.',
 			},
 		],
 		faqs: [
 			{
-				question: 'Como debo cuidar el latex?',
-				answer: 'Lavalo a mano, evita la secadora y no lo expongas a calor directo.',
+				question: '¿Cómo debo cuidar el látex?',
+				answer: 'Lávalo a mano, evita la secadora y no lo expongas a calor directo.',
 			},
 			{
-				question: 'Es una faja de compresion alta?',
-				answer: 'Ofrece una sensacion firme y elastica; si dudas entre tallas, revisa la tabla antes de comprar.',
+				question: '¿Es una faja de compresión alta?',
+				answer: 'Ofrece una sensación firme y elástica; si dudas entre tallas, revisa la tabla antes de comprar.',
 			},
 		],
 		relatedProductIds: ['faja_chaleco_cinturilla', 'cinturilla_reloj_arena'],
@@ -298,20 +298,20 @@ const productContentMap: Record<string, ProductContent> = {
 		headline: 'Faja short moldeadora para cintura, cadera y muslos.',
 		intro: 'Una prenda de cobertura extendida para suavizar la silueta y moverse con comodidad.',
 		longDescription:
-			'La faja short moldeadora esta pensada para acompanar abdomen, cintura, cadera y muslos con una compresion equilibrada. Su formato tipo short ayuda a crear una linea continua bajo vestidos, faldas o pantalones.',
+			'La faja short moldeadora está pensada para acompañar abdomen, cintura, cadera y muslos con una compresión equilibrada. Su formato tipo short ayuda a crear una línea continua bajo vestidos, faldas o pantalones.',
 		benefits: [
 			'Moldea cintura, cadera y muslos en una sola prenda.',
 			'Ayuda a evitar cortes visibles bajo ropa ajustada.',
-			'Ofrece soporte comodo para uso diario o eventos.',
+			'Ofrece soporte cómodo para uso diario o eventos.',
 		],
 		features: [
 			{
 				title: 'Cobertura tipo short',
-				description: 'Extiende el moldeo hacia cadera y muslos para un acabado mas uniforme.',
+				description: 'Extiende el moldeo hacia cadera y muslos para un acabado más uniforme.',
 			},
 			{
-				title: 'Tela elastica',
-				description: 'Acompana el movimiento y mantiene una sensacion de ajuste estable.',
+				title: 'Tela elástica',
+				description: 'Acompaña el movimiento y mantiene una sensación de ajuste estable.',
 			},
 			{
 				title: 'Acabado discreto',
@@ -321,7 +321,7 @@ const productContentMap: Record<string, ProductContent> = {
 		sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
 		colors: ['Negro'],
 		care: [
-			'Lavar a mano con agua fria.',
+			'Lavar a mano con agua fría.',
 			'No usar secadora.',
 			'Secar a la sombra para conservar la elasticidad.',
 		],
@@ -337,22 +337,22 @@ const productContentMap: Record<string, ProductContent> = {
 			{
 				author: 'Sara D.',
 				role: 'Cliente verificada',
-				comment: 'El formato short me da mas seguridad con vestidos ajustados.',
+				comment: 'El formato short me da más seguridad con vestidos ajustados.',
 			},
 			{
 				author: 'Irene A.',
 				role: 'Compra online',
-				comment: 'Moldea sin sentirse rigida y queda bastante discreta.',
+				comment: 'Moldea sin sentirse rígida y queda bastante discreta.',
 			},
 		],
 		faqs: [
 			{
-				question: 'Marca debajo de vestidos?',
-				answer: 'Su diseno tipo short ayuda a crear una linea mas continua, aunque dependera del tejido de la prenda exterior.',
+				question: '¿Marca debajo de vestidos?',
+				answer: 'Su diseño tipo short ayuda a crear una línea más continua, aunque dependerá del tejido de la prenda exterior.',
 			},
 			{
-				question: 'Cubre tambien la zona de muslos?',
-				answer: 'Si, esta pensada para acompanar cintura, cadera y parte de los muslos.',
+				question: '¿Cubre también la zona de muslos?',
+				answer: 'Sí, está pensada para acompañar cintura, cadera y parte de los muslos.',
 			},
 		],
 		relatedProductIds: ['faja_control_abdominal', 'faja_latex'],

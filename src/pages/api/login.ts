@@ -6,6 +6,7 @@ import { loginUsuario } from "../../lib/users";
 import { clearUserSession, setUserSession } from "../../lib/userSession";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
+  console.log(">>>>>>>>>>>> LOGIN.TS EJECUTÁNDOSE <<<<<<<<<<<<");
   const data = await request.formData();
 
   const mail = String(data.get("mail") ?? "");
@@ -16,12 +17,27 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       mail,
       password,
     });
+    console.log("===== RECORDSETS =====");
+    console.dir(result.recordsets, { depth: null });
+
+    console.log("===== RECORDSET 0 =====");
+    console.dir(result.recordsets?.[0], { depth: null });
+
+    console.log("===== RECORDSET 1 =====");
+    console.dir(result.recordsets?.[1], { depth: null });
+
+    console.log("===== RECORDSET 2 =====");
+    console.dir(result.recordsets?.[2], { depth: null });
     const userData = result.recordsets?.[1]?.[0];
+
+    console.log("USER DATA:");
+    console.log(JSON.stringify(userData, null, 2));
     console.log(JSON.stringify(result, null, 2));
 
     const isAdmin = result.ok && isAdminEmail(mail);
 
     if (result.ok && userData?.ID) {
+
       setUserSession(cookies, userData.ID);
     } else {
       clearUserSession(cookies);
@@ -40,7 +56,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           name: userData?.Name ?? mail,
         });
       } catch (emailError) {
-        console.error("Error enviando correo de inicio de sesion:", emailError);
+        console.error("Error enviando correo de inicio de sesión:", emailError);
       }
     }
 
@@ -67,7 +83,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   } catch (error) {
     console.error(error);
 
-    return new Response(JSON.stringify({ ok: false, message: "Error al iniciar sesion" }), {
+    return new Response(JSON.stringify({ ok: false, message: "Error al iniciar sesión" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

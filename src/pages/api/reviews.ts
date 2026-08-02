@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
-import { addProductReview, getReviewsForProduct, isValidProductId } from "../../lib/reviews";
+import { getUserSession } from "../../lib/userSession";
+import { ReviewRepository } from "../../repositories/ReviewRepository";
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -11,29 +12,74 @@ function json(body: unknown, status = 200) {
 export const GET: APIRoute = async ({ url }) => {
   const productId = url.searchParams.get("productId")?.trim() ?? "";
 
-  if (!isValidProductId(productId)) {
-    return json({ ok: false, message: "Producto no valido." }, 400);
+  if (!productId) {
+    return json({ ok: false, message: "Producto no válido." }, 400);
   }
 
-  return json({ ok: true, reviews: getReviewsForProduct(productId) });
+  const reviews = await ReviewRepository.getReviews(productId);
+  const summary = await ReviewRepository.getAverageRating(productId);
+
+  return json({
+    ok: true,
+    reviews,
+    average: summary.Media ?? 0,
+    total: summary.Total ?? 0,
+  });
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
+  const session = await getUserSession(cookies);
+
+  if (!session) {
+    return json({ ok: false, message: "Debes iniciar sesión." }, 401);
+  }
+
   const body = await request.json().catch(() => ({}));
 
-  try {
-    const review = addProductReview({
-      productId: body.productId,
-      name: body.name,
-      rating: body.rating,
-      comment: body.comment,
-    });
+  const { productId, rating, comment } = body;
 
-    return json({ ok: true, review, reviews: getReviewsForProduct(review.productId) }, 201);
-  } catch (error) {
+  if (!productId || !rating || !comment) {
+    return json({ ok: false, message: "Datos incompletos." }, 400);
+  }
+
+  const purchased = await ReviewRepository.hasPurchased(
+    session.id,
+    productId
+  );
+
+  if (!purchased) {
     return json(
-      { ok: false, message: error instanceof Error ? error.message : "No se pudo guardar la resena." },
-      400,
+      {
+        ok: false,
+        message: "Solo puedes valorar productos que hayas comprado.",
+      },
+      403
     );
   }
+
+  if (await ReviewRepository.hasReviewed(session.id, productId)) {
+    await ReviewRepository.updateReview(
+      session.id,
+      productId,
+      Number(rating),
+      comment
+    );
+  } else {
+    await ReviewRepository.addReview(
+      session.id,
+      productId,
+      Number(rating),
+      comment
+    );
+  }
+
+  const reviews = await ReviewRepository.getReviews(productId);
+  const summary = await ReviewRepository.getAverageRating(productId);
+
+  return json({
+    ok: true,
+    reviews,
+    average: summary.Media ?? 0,
+    total: summary.Total ?? 0,
+  });
 };

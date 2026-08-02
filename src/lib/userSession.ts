@@ -66,7 +66,7 @@ function decodeSession(value: string): UserSession | null {
 
   return { id };
 }
-
+// console.log(JSON.stringify(userData, null, 2));
 export function setUserSession(cookies: CookieJar, id: string) {
 
   cookies.set(USER_COOKIE_NAME, encodeSession(id), {

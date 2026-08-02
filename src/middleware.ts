@@ -45,7 +45,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       </head>
       <body>
         <main>
-          <h1>CurvySweet esta en mantenimiento</h1>
+          <h1>CurvySweet está en mantenimiento</h1>
           <p>Estamos ajustando la tienda. Vuelve en unos minutos.</p>
         </main>
       </body>

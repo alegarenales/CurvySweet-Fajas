@@ -40,7 +40,7 @@ const slides = (products.length ? products.slice(0, 3) : [ /* fallback */ ])
 		<p class="shop-carousel-kicker">CurvySweet Shop</p>
 		<h2>Tu escaparate principal</h2>
 		<p class="shop-carousel-subtitle">
-			Productos destacados y mas vendidos
+			Productos destacados y más vendidos
 		</p>
 	</div>
 
@@ -131,6 +131,7 @@ const slides = (products.length ? products.slice(0, 3) : [ /* fallback */ ])
 </section>
 
 <script>
+	console.log("SCRIPT FAVORITOS CARGADO");
 	const carousels = document.querySelectorAll('[data-shop-carousel]');
 	const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -256,4 +257,46 @@ const slides = (products.length ? products.slice(0, 3) : [ /* fallback */ ])
 		render(0);
 		startAutoplay();
 	});
+
+loadFavorites();
+const buttons = document.querySelectorAll("[data-favorite-button]");
+
+console.log("BOTONES:", buttons.length);
+console.log(buttons);
+document
+.querySelectorAll("[data-favorite-button]")
+.forEach(button => {
+
+    button.addEventListener("click", async (e) => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const productId = button.dataset.productId;
+
+        const favorite = button.classList.contains("is-favorite");
+
+        const response = await fetch("/api/favorites",{
+            method: favorite ? "DELETE" : "POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                productId
+            })
+        });
+
+        if(!response.ok){
+            return;
+        }
+
+        button.classList.toggle("is-favorite");
+        button.textContent =
+            button.classList.contains("is-favorite")
+                ? "♥"
+                : "♡";
+
+    });
+
+});
 </script>
