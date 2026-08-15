@@ -32,11 +32,15 @@ function safeFailureMessage(procedureMessage: string) {
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
 
-  if (normalized.includes("bloquead") || normalized.includes("inactiv")) {
+  if (isBlockedMessage(normalized)) {
     return "Tu cuenta está bloqueada. Ponte en contacto con nosotros.";
   }
 
   return GENERIC_LOGIN_ERROR;
+}
+
+function isBlockedMessage(normalizedMessage: string) {
+  return normalizedMessage.includes("bloquead") || normalizedMessage.includes("inactiv");
 }
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -76,8 +80,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const result = await loginUsuario({ mail, password });
     const recordsets = result.recordsets as Record<string, unknown>[][] | undefined;
     const userData = findUserRow(recordsets);
+    const normalizedProcedureMessage = result.message
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase();
 
-    if (!result.ok || !userData?.ID) {
+    if (!userData?.ID || isBlockedMessage(normalizedProcedureMessage)) {
       // Aunque el procedimiento diga que las credenciales son correctas, sin
       // fila de usuario no podemos crear una sesión fiable.
       clearUserSession(cookies);
