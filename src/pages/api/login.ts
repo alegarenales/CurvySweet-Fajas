@@ -1,4 +1,3 @@
-// src/pages/api/login.ts
 import type { APIRoute } from "astro";
 import { clearAdminSession, isAdminEmail, setAdminSession } from "../../lib/admin";
 import { sendLoginEmail } from "../../lib/mail";
@@ -8,29 +7,41 @@ import { getClientIp, json, readFormBody } from "../../lib/security/http";
 import { RATE_LIMITS, checkRateLimit, resetRateLimit } from "../../lib/security/rateLimit";
 import { isValidEmail, normalizeEmail } from "../../lib/security/validation";
 
-/**
- * Mensaje único para cualquier fallo de credenciales. Distinguir entre "ese
- * correo no existe" y "la contraseña no es correcta" permitiría a un atacante
- * averiguar qué correos están registrados.
- */
 const GENERIC_LOGIN_ERROR = "Email o contraseña incorrectos.";
+const LOGIN_ENDPOINT_VERSION = "curvysweet-login-2026-08-16-v2";
 
-function findUserRow(recordsets: Record<string, unknown>[][] | undefined) {
-  return recordsets
-    ?.flat()
-    .find((row) => row && typeof row === "object" && "ID" in row);
+function loginJson(body: unknown, status = 200, headers: HeadersInit = {}) {
+  return json(body, status, {
+    "X-CurvySweet-Login-Version": LOGIN_ENDPOINT_VERSION,
+    ...headers,
+  });
 }
 
-/**
- * Del mensaje que devuelve el procedimiento almacenado solo dejamos pasar el
- * aviso de cuenta bloqueada, porque el usuario necesita saber que el problema
- * no es su contraseña. Todo lo demás se sustituye por el mensaje genérico.
- */
-function safeFailureMessage(procedureMessage: string) {
-  const normalized = procedureMessage
+function findUserRow(recordsets: Record<string, unknown>[][] | undefined) {
+  return recordsets?.flat().find((row) => {
+    if (!row || typeof row !== "object") return false;
+
+    return "ID" in row || "Id" in row || "id" in row;
+  });
+}
+
+function getUserId(userData: Record<string, unknown>) {
+  return userData.ID ?? userData.Id ?? userData.id;
+}
+
+function normalizeProcedureMessage(message: string) {
+  return message
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase();
+}
+
+function isBlockedMessage(normalizedMessage: string) {
+  return normalizedMessage.includes("bloquead") || normalizedMessage.includes("inactiv");
+}
+
+function safeFailureMessage(procedureMessage: string) {
+  const normalized = normalizeProcedureMessage(procedureMessage);
 
   if (isBlockedMessage(normalized)) {
     return "Tu cuenta está bloqueada. Ponte en contacto con nosotros.";
@@ -39,33 +50,26 @@ function safeFailureMessage(procedureMessage: string) {
   return GENERIC_LOGIN_ERROR;
 }
 
-function isBlockedMessage(normalizedMessage: string) {
-  return normalizedMessage.includes("bloquead") || normalizedMessage.includes("inactiv");
-}
-
 export const POST: APIRoute = async ({ request, cookies }) => {
   const clientIp = getClientIp(request);
   const data = await readFormBody(request);
 
   if (!data) {
-    return json({ ok: false, message: "Petición inválida." }, 400);
+    return loginJson({ ok: false, message: "Petición inválida." }, 400);
   }
 
   const mail = normalizeEmail(data.get("mail"));
   const password = String(data.get("password") ?? "");
 
   if (!isValidEmail(mail) || !password || password.length > 200) {
-    return json({ ok: false, message: GENERIC_LOGIN_ERROR }, 400);
+    return loginJson({ ok: false, message: GENERIC_LOGIN_ERROR }, 400);
   }
 
-  // Dos contadores: uno por IP (frena el escaneo de muchas cuentas desde un
-  // mismo sitio) y otro por cuenta (frena el ataque distribuido contra una
-  // cuenta concreta).
   for (const identifier of [clientIp, mail]) {
     const limit = checkRateLimit(identifier, RATE_LIMITS.login);
 
     if (!limit.allowed) {
-      return json(
+      return loginJson(
         {
           ok: false,
           message: `Demasiados intentos. Vuelve a probar en ${Math.ceil(limit.retryAfterSeconds / 60)} minutos.`,
@@ -80,23 +84,25 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const result = await loginUsuario({ mail, password });
     const recordsets = result.recordsets as Record<string, unknown>[][] | undefined;
     const userData = findUserRow(recordsets);
-    const normalizedProcedureMessage = result.message
-      .normalize("NFD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLowerCase();
+    const userId = userData ? getUserId(userData) : null;
+    const normalizedProcedureMessage = normalizeProcedureMessage(result.message);
 
-    if (!userData?.ID || isBlockedMessage(normalizedProcedureMessage)) {
-      // Aunque el procedimiento diga que las credenciales son correctas, sin
-      // fila de usuario no podemos crear una sesión fiable.
+    if (!userData || !userId || isBlockedMessage(normalizedProcedureMessage)) {
+      console.warn("Login rechazado por respuesta incompleta del procedimiento.", {
+        procedureMessage: result.message,
+        recordsetSizes: recordsets?.map((recordset) => recordset.length) ?? [],
+        firstRowKeys: recordsets?.map((recordset) => Object.keys(recordset[0] ?? {})) ?? [],
+      });
+
       clearUserSession(cookies);
       clearAdminSession(cookies);
 
-      return json({ ok: false, message: safeFailureMessage(result.message) }, 401);
+      return loginJson({ ok: false, message: safeFailureMessage(result.message) }, 401);
     }
 
     const isAdmin = isAdminEmail(mail);
 
-    setUserSession(cookies, String(userData.ID));
+    setUserSession(cookies, String(userId));
 
     if (isAdmin) {
       setAdminSession(cookies, mail);
@@ -104,37 +110,31 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       clearAdminSession(cookies);
     }
 
-    // El usuario ha demostrado conocer la contraseña: liberamos sus contadores
-    // para que un par de fallos previos no le penalicen.
     resetRateLimit(clientIp, RATE_LIMITS.login.name);
     resetRateLimit(mail, RATE_LIMITS.login.name);
 
     try {
-      await sendLoginEmail({ to: mail, name: String(userData.Name ?? mail) });
+      await sendLoginEmail({ to: mail, name: String(userData.Name ?? userData.name ?? mail) });
     } catch (emailError) {
       console.error("Error enviando correo de inicio de sesión.", emailError);
     }
 
-    // Devolvemos solo los campos que necesita la interfaz. Antes se enviaba el
-    // resultado completo del procedimiento almacenado, lo que exponía al
-    // navegador columnas internas de la tabla USERS.
-    return json({
+    return loginJson({
       ok: true,
       message: "Sesión iniciada correctamente.",
       user: {
-        id: userData.ID,
-        name: userData.Name,
-        lastName: userData.Last_name,
-        username: userData.Username,
-        mail: userData.Mail,
-        rol: userData.Rol,
+        id: userId,
+        name: userData.Name ?? userData.name,
+        lastName: userData.Last_name ?? userData.lastName,
+        username: userData.Username ?? userData.username,
+        mail: userData.Mail ?? userData.mail ?? mail,
+        rol: userData.Rol ?? userData.rol,
         isAdmin,
       },
     });
   } catch (error) {
-    // El detalle va al registro del servidor; al cliente solo un mensaje neutro.
     console.error("Error al iniciar sesión.", error);
 
-    return json({ ok: false, message: "Error al iniciar sesión." }, 500);
+    return loginJson({ ok: false, message: "Error al iniciar sesión." }, 500);
   }
 };
