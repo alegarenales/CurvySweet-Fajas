@@ -80,6 +80,16 @@ export default defineConfig({
     devToolbar: {
         enabled: true,
     },
+    vite: {
+        build: {
+            // Por defecto Astro incrusta en el HTML los scripts empaquetados
+            // que pesan poco. Eso choca con `script-src 'self'`: el navegador
+            // los bloquea y, por ejemplo, el formulario de login deja de
+            // interceptar el envío. Con el límite a 0 todos los scripts salen
+            // como ficheros del propio dominio y la política se cumple.
+            assetsInlineLimit: 0,
+        },
+    },
     security: {
         // La comprobación de origen (CSRF) la hace `src/middleware.ts`, que
         // cubre además las peticiones JSON y exime explícitamente al webhook de

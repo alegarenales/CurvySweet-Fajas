@@ -11,11 +11,20 @@ const isProduction = () => import.meta.env.PROD === true;
 /**
  * Content-Security-Policy.
  *
- * `script-src 'self'` es posible porque el sitio no tiene ningún `<script>`
- * en línea ni atributos `onclick=` en el HTML: Astro empaqueta todos los
- * scripts en ficheros del propio dominio. `style-src` sí necesita
- * `'unsafe-inline'` porque Astro incrusta las hojas pequeñas como `<style>` y
- * varios componentes usan atributos `style=` para las imágenes de producto.
+ * `script-src 'self'` exige que en el HTML no quede JavaScript en línea. Para
+ * eso hicieron falta tres cosas, y las tres deben mantenerse:
+ *
+ *   1. Ningún atributo `onclick=` en las plantillas (se usa delegación de
+ *      eventos en su lugar).
+ *   2. Ningún `<script define:vars>`, que Astro obliga a dejar en línea; los
+ *      datos se pasan por atributos `data-`.
+ *   3. `assetsInlineLimit: 0` en `astro.config.mjs`. Sin eso Astro incrusta en
+ *      el HTML los scripts empaquetados pequeños, el navegador los bloquea y
+ *      formularios como el de login dejan de funcionar en producción.
+ *
+ * `style-src` sí necesita `'unsafe-inline'`: aunque las hojas ya no se
+ * incrustan, varios componentes usan atributos `style=` para las imágenes de
+ * producto, y la CSP los cubre con esa misma directiva.
  */
 function contentSecurityPolicy(): string {
   const directives: Record<string, string[]> = {

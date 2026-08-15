@@ -3,6 +3,7 @@ import { getAdminSession } from "./lib/admin";
 import { readAdminState } from "./lib/admin-state";
 import { applySecurityHeaders } from "./lib/security/headers";
 import { getClientIp } from "./lib/security/http";
+import { hasValidOrigin } from "./lib/security/origin";
 import { RATE_LIMITS, checkRateLimit } from "./lib/security/rateLimit";
 
 const bypassPrefixes = ["/api", "/_astro", "/favicon", "/curvysweet.ico"];
@@ -19,39 +20,6 @@ const stateChangingMethods = new Set(["POST", "PATCH", "PUT", "DELETE"]);
  * propia firma (`stripe-signature`), que se verifica en el endpoint.
  */
 const externalCallerPrefixes = ["/api/webhooks/"];
-
-/**
- * Protección CSRF: una petición que cambia estado solo se acepta si viene de
- * nuestro propio dominio. Las cookies son `SameSite=Lax`, lo que ya bloquea el
- * caso habitual, pero esto lo cierra también para navegadores antiguos y para
- * subdominios que pudieran quedar comprometidos.
- */
-function hasValidOrigin(request: Request, url: URL): boolean {
-  const origin = request.headers.get("origin");
-
-  if (origin) {
-    try {
-      return new URL(origin).host === url.host;
-    } catch {
-      return false;
-    }
-  }
-
-  // Sin `Origin`, aceptamos `Referer` del mismo host. Si tampoco hay, dejamos
-  // pasar: algunos clientes legítimos no envían ninguna de las dos y el resto
-  // de defensas (SameSite, sesión firmada) siguen en pie.
-  const referer = request.headers.get("referer");
-
-  if (referer) {
-    try {
-      return new URL(referer).host === url.host;
-    } catch {
-      return false;
-    }
-  }
-
-  return true;
-}
 
 function maintenanceResponse() {
   return new Response(
@@ -111,7 +79,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (
     stateChangingMethods.has(method) &&
     !externalCallerPrefixes.some((prefix) => pathname.startsWith(prefix)) &&
-    !hasValidOrigin(context.request, url)
+    !hasValidOrigin(context.request)
   ) {
     return applySecurityHeaders(
       new Response(JSON.stringify({ ok: false, message: "Origen no permitido." }), {
