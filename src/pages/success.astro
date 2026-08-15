@@ -1,5 +1,9 @@
 ---
-const sessionId = Astro.url.searchParams.get("session_id");
+// El identificador de sesión llega en la URL, así que es texto controlado por
+// quien abre la página: solo lo aceptamos si tiene la forma que emite Stripe.
+// El endpoint `/api/checkout-session` vuelve a comprobarlo por su cuenta.
+const rawSessionId = Astro.url.searchParams.get("session_id") ?? "";
+const sessionId = /^cs_[A-Za-z0-9_]{1,200}$/.test(rawSessionId) ? rawSessionId : "";
 ---
 
 <html lang="es">
@@ -10,7 +14,7 @@ const sessionId = Astro.url.searchParams.get("session_id");
     <title>Pago confirmado | CurvySweet</title>
   </head>
   <body>
-    <main class="status-page">
+    <main class="status-page" data-checkout-session={sessionId}>
       <section class="status-card">
         <p class="status-kicker">CurvySweet</p>
         <h1>Pago confirmado</h1>
@@ -117,7 +121,13 @@ const sessionId = Astro.url.searchParams.get("session_id");
   }
 </style>
 
-<script define:vars={{ sessionId }}>
+{/*
+  Sin `define:vars`: esa directiva obliga a Astro a dejar el script en línea en
+  el HTML, y la política de seguridad de contenido prohíbe el JavaScript en
+  línea. El identificador se pasa por un atributo `data-` y Astro puede
+  empaquetar el script como fichero externo del propio dominio.
+*/}
+<script>
   const readJson = (key, fallback) => {
     try {
       return JSON.parse(localStorage.getItem(key) || "") ?? fallback;
@@ -126,6 +136,7 @@ const sessionId = Astro.url.searchParams.get("session_id");
     }
   };
 
+  const sessionId = document.querySelector("[data-checkout-session]")?.dataset.checkoutSession ?? "";
   const user = readJson("curvysweetUser", null);
 
   if (sessionId && user) {

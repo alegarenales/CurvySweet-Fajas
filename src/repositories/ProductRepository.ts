@@ -67,22 +67,13 @@ export class ProductRepository {
                 .trim()
         );
 
-        console.log("==================================");
-        console.log("Actualizando producto:", id);
-        console.log("Datos:", data);
-        console.log("Precio convertido:", price);
-        console.log("==================================");
-
-        const result = await pool.request()
+        await pool.request()
             .input("Id", id)
             .input("Nombre", data.name)
             .input("Precio", price)
             .input("Stock", data.stock)
             .input("EnStock", data.inStock)
             .execute("sp_product_update");
-
-        console.log("ReturnValue:", result.returnValue);
-        console.log("RowsAffected:", result.rowsAffected);
 
     }
 

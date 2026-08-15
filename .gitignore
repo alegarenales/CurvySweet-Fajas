@@ -14,8 +14,15 @@ yarn-error.log*
 pnpm-debug.log*
 
 # environment variables
+# Se ignora cualquier variante (.env.local, .env.bak, .env.production...) y se
+# vuelve a incluir solo la plantilla sin secretos.
 .env
-.env.production
+.env.*
+!.env.example
+
+# estado local del panel de administración y registros
+.curvysweet/
+access.log
 
 # macOS-specific files
 .DS_Store

@@ -1,12 +1,18 @@
 import type { APIRoute } from "astro";
 import Stripe from "stripe";
+import { serverEnv } from "../../lib/security/secrets";
 
-const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
+// En tiempo de ejecución: así la clave secreta de Stripe no queda escrita
+// dentro de los ficheros generados por la compilación.
+const stripeSecretKey = serverEnv("STRIPE_SECRET_KEY");
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
   });
 }
 

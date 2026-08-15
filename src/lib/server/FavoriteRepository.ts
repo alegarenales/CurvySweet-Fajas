@@ -6,7 +6,6 @@ export class FavoriteRepository {
         usuarioId: string,
         productoId: string
     ) {
-console.log("ADD FAVORITE", { usuarioId, productoId });
         const pool = await getPool();
 
         await pool.request()

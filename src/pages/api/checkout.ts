@@ -2,37 +2,62 @@ import type { APIRoute } from "astro";
 import Stripe from "stripe";
 import { ProductRepository } from "../../repositories/ProductRepository";
 import { getUserSession } from "../../lib/userSession";
+import { getClientIp, readJsonBody } from "../../lib/security/http";
+import { RATE_LIMITS, checkRateLimit } from "../../lib/security/rateLimit";
+import { isValidIdentifier } from "../../lib/security/validation";
+import { serverEnv } from "../../lib/security/secrets";
 
-const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
+// En tiempo de ejecución: así la clave secreta de Stripe no queda escrita
+// dentro de los ficheros generados por la compilación.
+const stripeSecretKey = serverEnv("STRIPE_SECRET_KEY");
+
+/** Tope de líneas por carrito, para que nadie pida miles de productos a la vez. */
+const MAX_LINE_ITEMS = 20;
 
 function jsonResponse(status: number, payload: Record<string, string>) {
   return new Response(JSON.stringify(payload), {
     status,
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
     },
   });
 }
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   if (!stripeSecretKey) {
-    return jsonResponse(500, {
-      error: "Falta configurar STRIPE_SECRET_KEY en el entorno del servidor.",
-    });
+    // El detalle de qué variable falta es información de infraestructura: se
+    // registra en el servidor, no se envía al navegador.
+    console.error("Falta configurar STRIPE_SECRET_KEY en el entorno del servidor.");
+    return jsonResponse(500, { error: "El pago no está disponible ahora mismo." });
   }
 
-  let body: { productId?: string; items?: { productId?: string; quantity?: number }[] };
-  try {
-    body = await request.json();
-  } catch {
+  const limit = checkRateLimit(getClientIp(request), RATE_LIMITS.checkout);
+
+  if (!limit.allowed) {
+    return jsonResponse(429, { error: "Demasiados intentos de pago. Espera unos minutos." });
+  }
+
+  const body = await readJsonBody<{
+    productId?: string;
+    items?: { productId?: string; quantity?: number }[];
+  }>(request);
+
+  if (!body) {
     return jsonResponse(400, { error: "Body inválido." });
   }
 
-  const requestedItems = Array.isArray(body.items) && body.items.length
-    ? body.items
-    : [{ productId: body.productId, quantity: 1 }];
+  const requestedItems = (
+    Array.isArray(body.items) && body.items.length
+      ? body.items
+      : [{ productId: body.productId, quantity: 1 }]
+  ).slice(0, MAX_LINE_ITEMS);
 
-  const DEV_TEST_PRICE = import.meta.env.STRIPE_TEST_PRICE_ID ?? "";
+  if (requestedItems.some((item) => !isValidIdentifier(item.productId?.trim()))) {
+    return jsonResponse(400, { error: "Hay productos inválidos en el carrito." });
+  }
+
+  const DEV_TEST_PRICE = serverEnv("STRIPE_TEST_PRICE_ID") ?? "";
 
 const lineItems = await Promise.all(
   requestedItems.map(async (item) => {
@@ -100,7 +125,16 @@ const lineItems = await Promise.all(
   }
   const user = getUserSession(cookies);
   const stripe = new Stripe(stripeSecretKey, { apiVersion: '2026-05-27.dahlia' });
-  const baseUrl = import.meta.env.PUBLIC_SITE_URL;
+
+  // La URL de retorno nunca se toma de la petición: si dependiera de una
+  // cabecera controlable por el cliente, se podría redirigir a la clienta a un
+  // dominio ajeno tras pagar. Sale de la configuración del servidor.
+  const baseUrl = import.meta.env.PUBLIC_SITE_URL || import.meta.env.SITE;
+
+  if (!baseUrl) {
+    console.error("Falta PUBLIC_SITE_URL: no se puede construir la URL de retorno de Stripe.");
+    return jsonResponse(500, { error: "El pago no está disponible ahora mismo." });
+  }
 
   const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${baseUrl}/cancel`;
@@ -129,11 +163,9 @@ const lineItems = await Promise.all(
 
     return jsonResponse(200, { url: session.url });
   } catch (error) {
-    const stripeError = error instanceof Error ? error.message : "Error desconocido de Stripe.";
+    // Los mensajes de Stripe pueden mencionar identificadores de precio, claves
+    // o límites de la cuenta. Se quedan en el registro del servidor.
     console.error("Error creando Checkout Session:", error);
-    return jsonResponse(500, {
-      error: `No se pudo iniciar el checkout. ${stripeError}`,
-      stripeError,
-    });
+    return jsonResponse(500, { error: "No se pudo iniciar el pago. Inténtalo de nuevo." });
   }
 };

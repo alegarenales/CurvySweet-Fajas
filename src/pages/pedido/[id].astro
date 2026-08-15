@@ -1,22 +1,27 @@
 ---
 import BarMenu from "../../components/BarMenu.astro";
+import { getUserSession } from "../../lib/userSession";
+import { isValidIdentifier } from "../../lib/security/validation";
+import { OrderRepository } from "../../repositories/OrderRepository";
 
 const { id } = Astro.params;
+const session = getUserSession(Astro.cookies);
 
-const response = await fetch(
-    new URL(`/api/orders/${id}`, Astro.url),
-    {
-        headers: {
-            cookie: Astro.request.headers.get("cookie") ?? "",
-        },
-    }
-);
-
-if (!response.ok) {
-    return Astro.redirect("/perfil?tab=orders");
+if (!session) {
+    return Astro.redirect("/login");
 }
 
-const order = await response.json();
+// Se consulta el repositorio directamente en vez de hacer una petición HTTP a
+// la propia API: así el pedido se filtra siempre por el usuario de la sesión.
+// Pasar `session.id` es lo que impide que alguien vea el pedido de otra persona
+// cambiando el identificador de la URL.
+const order = isValidIdentifier(id)
+    ? await OrderRepository.getOrderById(id, session.id)
+    : null;
+
+if (!order) {
+    return Astro.redirect("/perfil?tab=orders");
+}
 ---
 
 <html lang="es">

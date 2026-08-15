@@ -9,6 +9,26 @@ const parsePrice = (price) => {
 
 const formatPrice = (amount) => `${amount.toFixed(amount % 1 ? 2 : 0)} EUR`;
 
+/**
+ * Escapa el texto que se interpola en HTML. Los datos del carrito vienen del
+ * catálogo, que edita el panel de administración: si alguien lograse guardar
+ * ahí un nombre con etiquetas, sin escapar se ejecutaría en el navegador de
+ * todas las clientas.
+ */
+const escapeHtml = (value) =>
+	String(value ?? '')
+		.replaceAll('&', '&amp;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+		.replaceAll('"', '&quot;')
+		.replaceAll("'", '&#39;');
+
+/** Solo dejamos pasar rutas de imagen del propio sitio. */
+const safeImageUrl = (value) => {
+	const url = String(value ?? '');
+	return /^\/[A-Za-z0-9/_\-.]*$/.test(url) && !url.includes('..') ? url : '';
+};
+
 const getProducts = () => {
 	const source = document.getElementById('curvysweet-cart-products');
 
@@ -139,25 +159,27 @@ function renderCart() {
 	document.querySelectorAll('[data-cart-items]').forEach((container) => {
 		container.innerHTML = cart.map((item) => {
 			const product = productMap.get(item.productId);
-			const image = product.image ? `style="background-image: url('${product.image}');"` : '';
+			const imageUrl = safeImageUrl(product.image);
+			const image = imageUrl ? `style="background-image: url('${imageUrl}');"` : '';
 			const stock = product.inStock ? '' : '<span class="cart-stock-pill">Sin stock</span>';
+			const link = safeImageUrl(product.link) || '#';
 
 			return `
 				<article class="cart-line">
 					<div class="cart-line-image" ${image}></div>
 					<div class="cart-line-copy">
-						<a href="${product.link}">${product.name}</a>
+						<a href="${escapeHtml(link)}">${escapeHtml(product.name)}</a>
 						<div class="cart-line-meta">
-							<span>${product.price}</span>
+							<span>${escapeHtml(product.price)}</span>
 							${stock}
 						</div>
 						<div class="cart-line-controls">
 							<div class="cart-qty-control" aria-label="Cantidad">
-								<button class="cart-qty-button" type="button" data-cart-decrease="${product.id}" aria-label="Restar">-</button>
-								<span class="cart-qty-value">${item.quantity}</span>
-								<button class="cart-qty-button" type="button" data-cart-increase="${product.id}" aria-label="Sumar">+</button>
+								<button class="cart-qty-button" type="button" data-cart-decrease="${escapeHtml(product.id)}" aria-label="Restar">-</button>
+								<span class="cart-qty-value">${Number(item.quantity) || 1}</span>
+								<button class="cart-qty-button" type="button" data-cart-increase="${escapeHtml(product.id)}" aria-label="Sumar">+</button>
 							</div>
-							<button class="cart-line-remove" type="button" data-cart-remove="${product.id}">Quitar</button>
+							<button class="cart-line-remove" type="button" data-cart-remove="${escapeHtml(product.id)}">Quitar</button>
 						</div>
 					</div>
 				</article>
@@ -189,10 +211,7 @@ const checkout = async () => {
 		const payload = await response.json();
 
 		if (!response.ok || !payload.url) {
-			const message = payload.stripeError
-				? `${payload.error} ${payload.stripeError}`
-				: payload.error || 'No se pudo iniciar el pago.';
-			throw new Error(message);
+			throw new Error(payload.error || 'No se pudo iniciar el pago.');
 		}
 
 		window.location.href = payload.url;

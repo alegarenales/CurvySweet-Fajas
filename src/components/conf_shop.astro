@@ -2,7 +2,14 @@
 import CartDrawer from './CartDrawer.astro';
 import './CSS/shop.css';
 import { ProductRepository } from '../repositories/ProductRepository';
+import { isSafeImagePath } from '../lib/security/validation';
+
 const products = await ProductRepository.getProducts();
+
+// Las rutas de imagen se interpolan dentro de un atributo `style`. Si alguien
+// consiguiera guardar en el catálogo una ruta con comillas, podría inyectar
+// CSS. Solo dejamos pasar rutas relativas de nuestro propio sitio.
+const safeImage = (value: string) => (isSafeImagePath(value) ? value : '');
 ---
 <section class="shop-section" id="shop">
 	<div class="shop-header">
@@ -20,8 +27,6 @@ const products = await ProductRepository.getProducts();
 					tabindex={product.link ? '0' : undefined}
 					data-product-id={product.id}
 					data-product-link={product.link ?? ''}
-					onclick="handleProductCardClick(event)"
-					onkeydown="handleProductCardKeydown(event)"
 					style={product.link ? 'cursor: pointer;' : ''}
 				>
 					<div class="product-card-top">
@@ -34,7 +39,6 @@ const products = await ProductRepository.getProducts();
 								class="favorite-button"
 								data-favorite-button
 								data-product-id={product.id}
-								onclick="console.log('CLICK HTML')"
 								aria-label="Añadir a favoritos"
 							>
 								♡
@@ -64,8 +68,8 @@ const products = await ProductRepository.getProducts();
 							class="product-image-layer is-active"
 							data-image-primary
 							data-product-image={product.id}
-							style={product.image
-								? `background-image: url('${product.image}');`
+							style={safeImage(product.image)
+								? `background-image: url('${safeImage(product.image)}');`
 								: `background-image: radial-gradient(circle at 75% 20%, rgba(255, 255, 255, 0.7), transparent 55%), linear-gradient(135deg, #ff8fcb, #f04aa8);`}
 						></div>
 						<div class="product-image-layer" data-image-secondary></div>
@@ -102,26 +106,44 @@ const products = await ProductRepository.getProducts();
 <script>
 const imageRotators = new WeakMap();
 
-window.handleProductCardClick = (event) => {
-    if (event.target.closest('[data-cart-add]')) {
-        return;
-    }
+// Estos manejadores estaban antes como atributos `onclick`/`onkeydown` en el
+// HTML. Se han pasado a delegación de eventos para que la política de seguridad
+// de contenido pueda prohibir todo el JavaScript en línea (`script-src 'self'`),
+// que es lo que corta de raíz la mayoría de los ataques de XSS.
+const followProductCard = (card) => {
+    const productLink = card.dataset.productLink;
 
-    const productLink = event.currentTarget.dataset.productLink;
-
-    if (productLink) {
+    // Solo navegamos a rutas internas: si el enlace del catálogo apuntara a
+    // otro dominio, no lo seguimos.
+    if (productLink && /^\/[^/\\]/.test(productLink)) {
         window.location.href = productLink;
     }
 };
 
-window.handleProductCardKeydown = (event) => {
+document.addEventListener('click', (event) => {
+    const card = event.target.closest('.product-card[data-product-link]');
+
+    if (!card || event.target.closest('[data-cart-add]') || event.target.closest('[data-favorite-button]')) {
+        return;
+    }
+
+    followProductCard(card);
+});
+
+document.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') {
         return;
     }
 
+    const card = event.target.closest?.('.product-card[data-product-link]');
+
+    if (!card) {
+        return;
+    }
+
     event.preventDefault();
-    window.handleProductCardClick(event);
-};
+    followProductCard(card);
+});
 
 const resetProductRotator = (imageElement) => {
     const state = imageRotators.get(imageElement);
@@ -228,21 +250,15 @@ loadFavorites();
 
 const buttons = document.querySelectorAll("[data-favorite-button]");
 
-console.log("BOTONES ENCONTRADOS:", buttons.length);
-
 buttons.forEach((button) => {
 
     button.addEventListener("click", async (e) => {
-
-        console.log("CLICK EN FAVORITO");
 
         e.preventDefault();
         e.stopPropagation();
 
         const productId = button.dataset.productId;
         const favorite = button.classList.contains("is-favorite");
-
-        console.log({ productId, favorite });
 
         const response = await fetch("/api/favorites", {
             method: favorite ? "DELETE" : "POST",
@@ -252,10 +268,8 @@ buttons.forEach((button) => {
             body: JSON.stringify({ productId })
         });
 
-        console.log("STATUS:", response.status);
-
         if (!response.ok) {
-            console.error("Error llamando a la API");
+            console.error("Error llamando a la API de favoritos.");
             return;
         }
 

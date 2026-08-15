@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { getRequiredSecret } from "./security/secrets";
 
 const USER_COOKIE_NAME = "curvysweet_user";
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
@@ -24,13 +25,11 @@ export type UserSession = {
 };
 
 function getSecret() {
-  return import.meta.env.USER_SESSION_SECRET ?? "curvysweet-dev-user-secret";
+  return getRequiredSecret("USER_SESSION_SECRET");
 }
 
 function sign(value: string) {
-  return createHmac("sha256", getSecret())
-    .update(value)
-    .digest("hex");
+  return createHmac("sha256", getSecret()).update(value).digest("hex");
 }
 
 function safeEqual(left: string, right: string) {
@@ -44,31 +43,56 @@ function safeEqual(left: string, right: string) {
   return timingSafeEqual(leftBuffer, rightBuffer);
 }
 
+/**
+ * La caducidad va dentro de la parte firmada. El `maxAge` de la cookie solo es
+ * una sugerencia para el navegador: quien tenga la cookie puede conservarla
+ * indefinidamente, así que la fecha de expiración tiene que verificarla el
+ * servidor.
+ */
 function encodeSession(id: string) {
-  const signature = sign(id);
+  const expiresAt = Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE_SECONDS;
+  const payload = `${Buffer.from(id).toString("base64url")}.${expiresAt}`;
 
-  return `${Buffer.from(id).toString("base64url")}.${signature}`;
+  return `${payload}.${sign(payload)}`;
 }
 
 function decodeSession(value: string): UserSession | null {
+  const parts = value.split(".");
 
-  const [encoded, signature] = value.split(".");
+  if (parts.length !== 3) {
+    return null;
+  }
 
-  if (!encoded || !signature) {
+  const [encoded, expiresAt, signature] = parts;
+
+  if (!encoded || !expiresAt || !signature) {
+    return null;
+  }
+
+  if (!safeEqual(signature, sign(`${encoded}.${expiresAt}`))) {
+    return null;
+  }
+
+  const expiry = Number(expiresAt);
+
+  if (!Number.isFinite(expiry) || expiry * 1000 < Date.now()) {
     return null;
   }
 
   const id = Buffer.from(encoded, "base64url").toString("utf8");
 
-  if (!safeEqual(signature, sign(id))) {
+  // El identificador se usa como parámetro en consultas SQL. Las consultas ya
+  // van parametrizadas, pero comprobamos también la forma: acepta GUID,
+  // identificadores numéricos y slugs, y descarta espacios, comillas y
+  // caracteres de control aunque la firma cuadre.
+  if (!id || id.length > 100 || !/^[A-Za-z0-9._:@{}-]+$/.test(id)) {
     return null;
   }
 
   return { id };
 }
-// console.log(JSON.stringify(userData, null, 2));
-export function setUserSession(cookies: CookieJar, id: string) {
 
+export function setUserSession(cookies: CookieJar, id: string) {
   cookies.set(USER_COOKIE_NAME, encodeSession(id), {
     httpOnly: true,
     secure: import.meta.env.PROD,
@@ -76,19 +100,15 @@ export function setUserSession(cookies: CookieJar, id: string) {
     path: "/",
     maxAge: COOKIE_MAX_AGE_SECONDS,
   });
-
 }
 
 export function clearUserSession(cookies: CookieJar) {
-
   cookies.delete(USER_COOKIE_NAME, {
     path: "/",
   });
-
 }
 
 export function getUserSession(cookies: CookieJar) {
-
   const cookie = cookies.get(USER_COOKIE_NAME);
 
   if (!cookie?.value) {
@@ -96,5 +116,4 @@ export function getUserSession(cookies: CookieJar) {
   }
 
   return decodeSession(cookie.value);
-
 }

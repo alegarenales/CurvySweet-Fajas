@@ -3,9 +3,12 @@ import { sendPurchaseEmail } from "../../../lib/mail";
 import { OrderRepository } from "../../../repositories/OrderRepository";
 import { UserRepository } from "../../../repositories/UserRepository";
 import Stripe from "stripe";
+import { serverEnv } from "../../../lib/security/secrets";
 
-const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
-const stripeWebhookSecret = import.meta.env.STRIPE_WEBHOOK_SECRET;
+// En tiempo de ejecución: ni la clave secreta ni el secreto de firma del
+// webhook deben acabar dentro de los ficheros generados por la compilación.
+const stripeSecretKey = serverEnv("STRIPE_SECRET_KEY");
+const stripeWebhookSecret = serverEnv("STRIPE_WEBHOOK_SECRET");
 
 export const POST: APIRoute = async ({ request }) => {
   if (!stripeSecretKey || !stripeWebhookSecret) {
@@ -42,18 +45,19 @@ switch (event.type) {
       }
     );
 
+    // El registro no incluye correo ni nombre: los registros de Vercel los
+    // puede leer cualquiera con acceso al proyecto, y son datos personales.
     console.log("Pago confirmado:", {
       sessionId: session.id,
-      customerEmail: session.customer_details?.email ?? null,
       amountTotal: session.amount_total ?? null,
       currency: session.currency ?? null,
     });
+
     const usuarioId = session.metadata?.usuarioId || null;
-    console.log("usuarioId:", usuarioId);
     const usuario = usuarioId
       ? await UserRepository.getById(usuarioId)
       : null;
-      console.log("usuario:", usuario);
+
     const pedidoId = await OrderRepository.createOrder({
 
       stripeSessionId: session.id,

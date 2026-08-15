@@ -1,65 +1,62 @@
 import type { APIRoute } from "astro";
 import { FavoriteRepository } from "../../lib/server/FavoriteRepository";
 import { getUserSession } from "../../lib/userSession";
-
+import { json, readJsonBody } from "../../lib/security/http";
+import { RATE_LIMITS, checkRateLimit } from "../../lib/security/rateLimit";
+import { isValidIdentifier } from "../../lib/security/validation";
 
 export const GET: APIRoute = async ({ cookies }) => {
+  const session = getUserSession(cookies);
 
-    const session = getUserSession(cookies);
+  if (!session) {
+    return json([]);
+  }
 
+  const favorites = await FavoriteRepository.getFavorites(session.id);
 
-    console.log(session);
-
-    if (!session) {
-        return Response.json([], { status: 200 });
-    }
-
-    const favorites = await FavoriteRepository.getFavorites(session.id);
-
-    return Response.json(favorites);
-
+  return json(favorites);
 };
 
-export const POST: APIRoute = async ({ request, cookies }) => {
-    console.log("POST /api/favorites");
+/**
+ * Alta y baja comparten comprobaciones: sesión válida, límite de peticiones e
+ * identificador de producto con la forma esperada.
+ */
+async function handleFavoriteChange(
+  request: Request,
+  cookies: Parameters<typeof getUserSession>[0],
+  action: "add" | "remove",
+) {
+  const session = getUserSession(cookies);
 
-    const session = getUserSession(cookies);
+  if (!session) {
+    return json({ ok: false, message: "No autorizado" }, 401);
+  }
 
-    if (!session) {
-        return Response.json(
-            { ok: false, message: "No autorizado" },
-            { status: 401 }
-        );
-    }
+  const limit = checkRateLimit(session.id, RATE_LIMITS.favorites);
 
-    const { productId } = await request.json();
+  if (!limit.allowed) {
+    return json({ ok: false, message: "Demasiadas peticiones." }, 429, {
+      "Retry-After": String(limit.retryAfterSeconds),
+    });
+  }
 
-    await FavoriteRepository.addFavorite(
-        session.id,
-        productId
-    );
-    return Response.json({ ok: true });
+  const body = await readJsonBody<{ productId?: unknown }>(request);
 
-};
+  if (!body || !isValidIdentifier(body.productId)) {
+    return json({ ok: false, message: "Producto no válido." }, 400);
+  }
 
-export const DELETE: APIRoute = async ({ request, cookies }) => {
+  if (action === "add") {
+    await FavoriteRepository.addFavorite(session.id, body.productId);
+  } else {
+    await FavoriteRepository.removeFavorite(session.id, body.productId);
+  }
 
-    const session = getUserSession(cookies);
+  return json({ ok: true });
+}
 
-    if (!session) {
-        return Response.json(
-            { ok: false, message: "No autorizado" },
-            { status: 401 }
-        );
-    }
+export const POST: APIRoute = async ({ request, cookies }) =>
+  handleFavoriteChange(request, cookies, "add");
 
-    const { productId } = await request.json();
-
-    await FavoriteRepository.removeFavorite(
-        session.id,
-        productId
-    );
-
-    return Response.json({ ok: true });
-
-};
+export const DELETE: APIRoute = async ({ request, cookies }) =>
+  handleFavoriteChange(request, cookies, "remove");

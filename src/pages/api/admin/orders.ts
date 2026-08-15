@@ -31,11 +31,13 @@ export const GET: APIRoute = async ({ cookies }) => {
 
     } catch (error) {
 
-        console.error(error);
+        // El texto del error de SQL Server puede revelar nombres de tabla y de
+        // servidor. Se registra, pero no se devuelve al navegador.
+        console.error("Error cargando pedidos:", error);
 
         return json({
             ok: false,
-            error: String(error)
+            message: "No se pudieron cargar los pedidos."
         }, 500);
     }
 

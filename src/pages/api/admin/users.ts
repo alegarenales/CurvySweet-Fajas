@@ -1,6 +1,9 @@
 import type { APIRoute } from "astro";
 import { getAdminSession } from "../../../lib/admin";
 import { getPool, sql } from "../../../lib/db";
+import { readFormBody } from "../../../lib/security/http";
+import { RATE_LIMITS, checkRateLimit } from "../../../lib/security/rateLimit";
+import { isValidIdentifier } from "../../../lib/security/validation";
 
 type DbUser = {
   ID: string;
@@ -71,18 +74,32 @@ export const GET: APIRoute = async ({ cookies }) => {
 };
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-  if (!getAdminSession(cookies)) {
+  const admin = getAdminSession(cookies);
+
+  if (!admin) {
     return new Response(JSON.stringify({ ok: false, message: "No autorizado." }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  const data = await request.formData();
-  const userId = String(data.get("userId") ?? "");
-  const state = Number(data.get("state") ?? 1);
+  const limit = checkRateLimit(admin.email, RATE_LIMITS.adminWrite);
 
-  if (!userId || ![1, 3].includes(state)) {
+  if (!limit.allowed) {
+    return new Response(JSON.stringify({ ok: false, message: "Demasiadas peticiones." }), {
+      status: 429,
+      headers: {
+        "Content-Type": "application/json",
+        "Retry-After": String(limit.retryAfterSeconds),
+      },
+    });
+  }
+
+  const data = await readFormBody(request);
+  const userId = String(data?.get("userId") ?? "");
+  const state = Number(data?.get("state") ?? 1);
+
+  if (!isValidIdentifier(userId) || ![1, 3].includes(state)) {
     return new Response(JSON.stringify({ ok: false, message: "Seleccion inválida." }), {
       status: 400,
       headers: { "Content-Type": "application/json" },

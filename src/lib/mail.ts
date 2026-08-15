@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { serverEnv } from "./security/secrets";
 
 type WelcomeEmailInput = {
   to: string;
@@ -14,7 +15,44 @@ const requiredEnv = [
 ] as const;
 
 function hasMailConfig() {
-  return requiredEnv.every((key) => Boolean(import.meta.env[key]));
+  return requiredEnv.every((key) => Boolean(serverEnv(key)));
+}
+
+/**
+ * Escapa el texto de las clientas antes de meterlo en el HTML del correo.
+ *
+ * El nombre viene del registro o de los datos de facturación de Stripe. Sin
+ * escapar, alguien podría enviarse a sí mismo (o a otra persona) un correo con
+ * enlaces o marcado inyectado que aparentaría venir de CurvySweet.
+ */
+function escapeHtml(value: string) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+/**
+ * Crea el transporte SMTP leyendo la configuración en tiempo de ejecución, para
+ * que la contraseña del correo no quede incrustada en el artefacto compilado.
+ */
+function createTransporter() {
+  const port = Number(serverEnv("SMTP_PORT"));
+
+  return nodemailer.createTransport({
+    host: serverEnv("SMTP_HOST"),
+    port,
+    // El puerto 465 va cifrado desde el principio; en el 587 se cifra con
+    // STARTTLS. `requireTLS` evita que la sesión acabe enviándose en claro.
+    secure: serverEnv("SMTP_SECURE") === "true" || port === 465,
+    requireTLS: port !== 465,
+    auth: {
+      user: serverEnv("SMTP_USER"),
+      pass: serverEnv("SMTP_PASSWORD"),
+    },
+  });
 }
 
 export async function sendLoginEmail({ to, name }: WelcomeEmailInput) {
@@ -23,25 +61,17 @@ export async function sendLoginEmail({ to, name }: WelcomeEmailInput) {
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: import.meta.env.SMTP_HOST,
-    port: Number(import.meta.env.SMTP_PORT),
-    secure: import.meta.env.SMTP_SECURE === "true",
-    auth: {
-      user: import.meta.env.SMTP_USER,
-      pass: import.meta.env.SMTP_PASSWORD,
-    },
-  });
+  const transporter = createTransporter();
 
   await transporter.sendMail({
-    from: import.meta.env.SMTP_FROM,
+    from: serverEnv("SMTP_FROM"),
     to,
     subject: "Bienvenida de nuevo a CurvySweet",
     text: `Nos alegra verte de nuevo, ${name}. Has iniciado sesión correctamente.`,
     html: `
       <div style="font-family: Arial, sans-serif; color: #2d1f26; line-height: 1.5;">
         <h1 style="color: #b84b73;">Bienvenida de nuevo a CurvySweet</h1>
-        <p>Hola ${name},</p>
+        <p>Hola ${escapeHtml(name)},</p>
         <p>Ya puedes acceder a la tienda cuando quieras.</p>
         <p>Con cariño,<br />CurvySweet</p>
       </div>
@@ -55,25 +85,17 @@ export async function sendWelcomeEmail({ to, name }: WelcomeEmailInput) {
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: import.meta.env.SMTP_HOST,
-    port: Number(import.meta.env.SMTP_PORT),
-    secure: import.meta.env.SMTP_SECURE === "true",
-    auth: {
-      user: import.meta.env.SMTP_USER,
-      pass: import.meta.env.SMTP_PASSWORD,
-    },
-  });
+  const transporter = createTransporter();
 
   await transporter.sendMail({
-    from: import.meta.env.SMTP_FROM,
+    from: serverEnv("SMTP_FROM"),
     to,
     subject: "Bienvenida a CurvySweet",
     text: `Hola ${name}, bienvenida a CurvySweet. Tu cuenta se ha creado correctamente.`,
     html: `
       <div style="font-family: Arial, sans-serif; color: #2d1f26; line-height: 1.5;">
         <h1 style="color: #b84b73;">Bienvenida a CurvySweet</h1>
-        <p>Hola ${name},</p>
+        <p>Hola ${escapeHtml(name)},</p>
         <p>Tu cuenta se ha creado correctamente. Gracias por registrarte.</p>
         <p>Con cariño,<br />CurvySweet</p>
       </div>
@@ -103,21 +125,13 @@ export async function sendPurchaseEmail({
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: import.meta.env.SMTP_HOST,
-    port: Number(import.meta.env.SMTP_PORT),
-    secure: import.meta.env.SMTP_SECURE === "true",
-    auth: {
-      user: import.meta.env.SMTP_USER,
-      pass: import.meta.env.SMTP_PASSWORD,
-    },
-  });
+  const transporter = createTransporter();
 
   const productsHtml = products
     .map(
       (p) => `
         <tr>
-          <td style="padding:8px;border-bottom:1px solid #eee;">${p.name}</td>
+          <td style="padding:8px;border-bottom:1px solid #eee;">${escapeHtml(p.name)}</td>
           <td style="padding:8px;text-align:center;border-bottom:1px solid #eee;">${p.quantity}</td>
           <td style="padding:8px;text-align:right;border-bottom:1px solid #eee;">${p.price}</td>
         </tr>
@@ -126,7 +140,7 @@ export async function sendPurchaseEmail({
     .join("");
 
   await transporter.sendMail({
-    from: import.meta.env.SMTP_FROM,
+    from: serverEnv("SMTP_FROM"),
     to,
     subject: "💖 Gracias por tu compra en CurvySweet",
     text: `Hola ${name}, hemos recibido correctamente tu pedido. Muchas gracias por confiar en CurvySweet.`,
@@ -137,7 +151,7 @@ export async function sendPurchaseEmail({
           ¡Gracias por tu compra!
         </h1>
 
-        <p>Hola ${name},</p>
+        <p>Hola ${escapeHtml(name)},</p>
 
         <p>
           Hemos recibido correctamente tu pedido y ya nos hemos puesto manos a la obra para prepararlo.
@@ -160,7 +174,7 @@ export async function sendPurchaseEmail({
         <hr style="margin:30px 0;">
 
         <h2 style="text-align:right;">
-          Total: ${total}
+          Total: ${escapeHtml(total)}
         </h2>
 
         <p>
@@ -193,15 +207,7 @@ export async function sendOrderStatusEmail({
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: import.meta.env.SMTP_HOST,
-    port: Number(import.meta.env.SMTP_PORT),
-    secure: import.meta.env.SMTP_SECURE === "true",
-    auth: {
-      user: import.meta.env.SMTP_USER,
-      pass: import.meta.env.SMTP_PASSWORD,
-    },
-  });
+  const transporter = createTransporter();
 
   const messages: Record<string, string> = {
     Pendiente:
@@ -225,7 +231,7 @@ export async function sendOrderStatusEmail({
     "El estado de tu pedido ha cambiado.";
 
   await transporter.sendMail({
-    from: import.meta.env.SMTP_FROM,
+    from: serverEnv("SMTP_FROM"),
     to,
     subject: `Actualización de tu pedido - ${status}`,
     text: `Hola ${name}. ${message}`,
@@ -236,13 +242,13 @@ export async function sendOrderStatusEmail({
           Estado actualizado
         </h1>
 
-        <p>Hola <strong>${name}</strong>,</p>
+        <p>Hola <strong>${escapeHtml(name)}</strong>,</p>
 
-        <p>${message}</p>
+        <p>${escapeHtml(message)}</p>
 
         <p>
           <strong>Estado actual:</strong>
-          ${status}
+          ${escapeHtml(status)}
         </p>
 
         <hr style="margin:30px 0;">

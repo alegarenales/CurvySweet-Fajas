@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { getRequiredSecret, serverEnv } from "./security/secrets";
 
 const ADMIN_COOKIE_NAME = "curvysweet_admin";
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 8;
@@ -24,7 +25,9 @@ export type AdminSession = {
 };
 
 function getAdminEmails() {
-  const rawEmails = import.meta.env.ADMIN_EMAILS ?? import.meta.env.ADMIN_EMAIL ?? "";
+  // Se lee en tiempo de ejecución para poder añadir o quitar administradoras
+  // desde Vercel sin volver a compilar el proyecto.
+  const rawEmails = serverEnv("ADMIN_EMAILS") ?? serverEnv("ADMIN_EMAIL") ?? "";
 
   return String(rawEmails)
     .split(",")
@@ -33,7 +36,7 @@ function getAdminEmails() {
 }
 
 function getAdminSecret() {
-  return import.meta.env.ADMIN_SESSION_SECRET ?? "curvysweet-dev-admin-secret";
+  return getRequiredSecret("ADMIN_SESSION_SECRET");
 }
 
 function normalizeEmail(email: string) {
@@ -55,28 +58,48 @@ function safeEqual(left: string, right: string) {
   return timingSafeEqual(leftBuffer, rightBuffer);
 }
 
+/**
+ * La caducidad forma parte del valor firmado. El `maxAge` de la cookie solo lo
+ * respeta el navegador; quien copie la cookie podría reutilizarla para siempre
+ * si el servidor no comprobase la fecha por su cuenta.
+ */
 function encodeSession(email: string) {
   const normalizedEmail = normalizeEmail(email);
-  const signature = sign(normalizedEmail);
+  const expiresAt = Math.floor(Date.now() / 1000) + COOKIE_MAX_AGE_SECONDS;
+  const payload = `${Buffer.from(normalizedEmail).toString("base64url")}.${expiresAt}`;
 
-  return `${Buffer.from(normalizedEmail).toString("base64url")}.${signature}`;
+  return `${payload}.${sign(payload)}`;
 }
 
 function decodeSession(value: string): AdminSession | null {
-  const [encodedEmail, signature] = value.split(".");
+  const parts = value.split(".");
 
-  if (!encodedEmail || !signature) {
+  if (parts.length !== 3) {
+    return null;
+  }
+
+  const [encodedEmail, expiresAt, signature] = parts;
+
+  if (!encodedEmail || !expiresAt || !signature) {
+    return null;
+  }
+
+  if (!safeEqual(signature, sign(`${encodedEmail}.${expiresAt}`))) {
+    return null;
+  }
+
+  const expiry = Number(expiresAt);
+
+  if (!Number.isFinite(expiry) || expiry * 1000 < Date.now()) {
     return null;
   }
 
   const email = Buffer.from(encodedEmail, "base64url").toString("utf8");
   const normalizedEmail = normalizeEmail(email);
-  const expectedSignature = sign(normalizedEmail);
 
-  if (!safeEqual(signature, expectedSignature)) {
-    return null;
-  }
-
+  // Segunda comprobación: aunque la firma sea válida, el correo tiene que
+  // seguir estando en ADMIN_EMAILS. Así, quitar a alguien de esa lista revoca
+  // su sesión de inmediato sin esperar a que caduque la cookie.
   if (!isAdminEmail(normalizedEmail)) {
     return null;
   }

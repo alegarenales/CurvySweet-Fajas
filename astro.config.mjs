@@ -81,6 +81,9 @@ export default defineConfig({
         enabled: true,
     },
     security: {
+        // La comprobación de origen (CSRF) la hace `src/middleware.ts`, que
+        // cubre además las peticiones JSON y exime explícitamente al webhook de
+        // Stripe, que llega desde fuera del navegador y se valida con su firma.
         checkOrigin: false,
     },
     integrations: [curvySweetDevToolbar()],

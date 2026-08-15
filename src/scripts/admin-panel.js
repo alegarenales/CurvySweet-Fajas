@@ -11,6 +11,24 @@ const toastMessage = document.getElementById("toast-message");
 
 let toastTimeout;
 
+/**
+ * Escapa el texto antes de interpolarlo en HTML.
+ *
+ * Los pedidos llevan datos escritos por las clientas (nombre y correo, tanto de
+ * la tabla USERS como de los datos de facturación que devuelve Stripe). Sin
+ * escapar, alguien podría registrarse con un nombre que contenga etiquetas y
+ * ejecutar código en el navegador de la administradora justo donde se gestionan
+ * todos los pedidos.
+ */
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function readJson(key, fallback) {
   try {
     return JSON.parse(localStorage.getItem(key) || "") ?? fallback;
@@ -181,19 +199,19 @@ function renderOrders(panel, orders) {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-            <td>${order.Id}</td>
-            <td>${order.Name}</td>
-            <td>${order.Mail}</td>
-            <td>${new Date(order.Fecha).toLocaleDateString("es-ES")}</td>
-            <td>${order.ImporteTotal} €</td>
-            <td data-order-state="${order.Id}">
-                ${order.Estado}
+            <td>${escapeHtml(order.Id)}</td>
+            <td>${escapeHtml(order.Name)}</td>
+            <td>${escapeHtml(order.Mail)}</td>
+            <td>${escapeHtml(new Date(order.Fecha).toLocaleDateString("es-ES"))}</td>
+            <td>${escapeHtml(order.ImporteTotal)} €</td>
+            <td data-order-state="${escapeHtml(order.Id)}">
+                ${escapeHtml(order.Estado)}
             </td>
             <td>
                 <button
                     type="button"
                     class="admin-primary-button"
-                    data-order-id="${order.Id}">
+                    data-order-id="${escapeHtml(order.Id)}">
                     Ver
                 </button>
             </td>
@@ -223,16 +241,16 @@ function renderOrders(panel, orders) {
               <div class="order-info">
 
                   <strong>ID</strong>
-                  <span>${order.Id}</span>
+                  <span>${escapeHtml(order.Id)}</span>
 
                   <strong>Cliente</strong>
-                  <span>${order.Name}</span>
+                  <span>${escapeHtml(order.Name)}</span>
 
                   <strong>Email</strong>
-                  <span>${order.Mail}</span>
+                  <span>${escapeHtml(order.Mail)}</span>
 
                   <strong>Fecha</strong>
-                  <span>${new Date(order.Fecha).toLocaleString()}</span>
+                  <span>${escapeHtml(new Date(order.Fecha).toLocaleString())}</span>
 
                   <strong>Estado</strong>
 
@@ -294,7 +312,7 @@ function renderOrders(panel, orders) {
                       <input
                           id="tracking-number"
                           type="text"
-                          value="${order.NumeroSeguimiento ?? ""}"
+                          value="${escapeHtml(order.NumeroSeguimiento ?? "")}"
                           placeholder="Ej. PQ123456789ES"
                       />
 
@@ -320,9 +338,9 @@ function renderOrders(panel, orders) {
 
                       ${order.Productos.map(product => `
                           <tr>
-                              <td>${product.NombreProducto}</td>
-                              <td>${product.Cantidad}</td>
-                              <td>${product.PrecioUnitario.toFixed(2)} €</td>
+                              <td>${escapeHtml(product.NombreProducto)}</td>
+                              <td>${Number(product.Cantidad) || 0}</td>
+                              <td>${(Number(product.PrecioUnitario) || 0).toFixed(2)} €</td>
                           </tr>
                       `).join("")}
 
@@ -368,10 +386,10 @@ function renderOrders(panel, orders) {
 
                               <div class="history-content">
 
-                                  <strong>${item.Estado}</strong>
+                                  <strong>${escapeHtml(item.Estado)}</strong>
 
                                   <span>
-                                      ${new Date(item.Fecha).toLocaleString("es-ES")}
+                                      ${escapeHtml(new Date(item.Fecha).toLocaleString("es-ES"))}
                                   </span>
 
                               </div>
