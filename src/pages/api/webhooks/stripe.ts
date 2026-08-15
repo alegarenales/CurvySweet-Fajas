@@ -54,6 +54,10 @@ switch (event.type) {
     });
 
     const usuarioId = session.metadata?.usuarioId || null;
+    const productIds = (session.metadata?.productIds ?? "")
+      .split(",")
+      .map((productId) => productId.trim())
+      .filter(Boolean);
     const usuario = usuarioId
       ? await UserRepository.getById(usuarioId)
       : null;
@@ -77,13 +81,13 @@ switch (event.type) {
         pedidoId,
         "Pendiente"
     );
-    for (const item of session.line_items?.data ?? []) {
+    for (const [index, item] of (session.line_items?.data ?? []).entries()) {
 
       await OrderRepository.addProduct({
 
         pedidoId,
 
-        productoId: item.price?.id ?? "",
+        productoId: productIds[index] ?? item.price?.id ?? "",
 
         nombreProducto: item.description,
 

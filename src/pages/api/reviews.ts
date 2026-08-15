@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ url, cookies }) => {
   const [reviews, summary, hasPurchased, hasReviewed] = await Promise.all([
     ReviewRepository.getReviews(productId),
     ReviewRepository.getAverageRating(productId),
-    session ? ReviewRepository.hasPurchased(session.id, productId) : false,
+    session ? ReviewRepository.hasPurchased(session.id, productId, product.stripePriceId) : false,
     session ? ReviewRepository.hasReviewed(session.id, productId) : false,
   ]);
 
@@ -95,7 +95,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return json({ ok: false, message: "Producto no encontrado." }, 404);
   }
 
-  const hasPurchased = await ReviewRepository.hasPurchased(session.id, productId);
+  const hasPurchased = await ReviewRepository.hasPurchased(
+    session.id,
+    productId,
+    product.stripePriceId,
+  );
 
   if (!hasPurchased) {
     return json(

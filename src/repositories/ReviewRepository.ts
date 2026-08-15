@@ -3,19 +3,31 @@ import { getPool } from "../lib/db";
 
 export class ReviewRepository {
 
-    static async hasPurchased(userId: string, productId: string): Promise<boolean> {
+    static async hasPurchased(
+        userId: string,
+        productId: string,
+        stripePriceId?: string | null
+    ): Promise<boolean> {
         const pool = await getPool();
 
-        const result = await pool.request()
+        const request = pool.request()
             .input("UsuarioId", sql.VarChar(50), userId)
-            .input("ProductoId", sql.NVarChar(100), productId)
-            .query(`
+            .input("ProductoId", sql.NVarChar(100), productId);
+
+        if (stripePriceId) {
+            request.input("StripePriceId", sql.NVarChar(255), stripePriceId);
+        }
+
+        const result = await request.query(`
                 SELECT TOP 1 1
                 FROM Pedidos p
                 INNER JOIN PedidoProductos pp
                     ON p.Id = pp.PedidoId
                 WHERE p.UsuarioId = @UsuarioId
-                  AND pp.ProductoId = @ProductoId
+                  AND (
+                    pp.ProductoId = @ProductoId
+                    ${stripePriceId ? "OR pp.ProductoId = @StripePriceId" : ""}
+                  )
                   AND p.Estado <> 'Cancelado'
             `);
 

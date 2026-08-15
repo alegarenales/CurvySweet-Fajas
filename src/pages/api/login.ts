@@ -15,6 +15,12 @@ import { isValidEmail, normalizeEmail } from "../../lib/security/validation";
  */
 const GENERIC_LOGIN_ERROR = "Email o contraseña incorrectos.";
 
+function findUserRow(recordsets: Record<string, unknown>[][] | undefined) {
+  return recordsets
+    ?.flat()
+    .find((row) => row && typeof row === "object" && "ID" in row);
+}
+
 /**
  * Del mensaje que devuelve el procedimiento almacenado solo dejamos pasar el
  * aviso de cuenta bloqueada, porque el usuario necesita saber que el problema
@@ -69,7 +75,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const result = await loginUsuario({ mail, password });
     const recordsets = result.recordsets as Record<string, unknown>[][] | undefined;
-    const userData = recordsets?.[1]?.[0];
+    const userData = findUserRow(recordsets);
 
     if (!result.ok || !userData?.ID) {
       // Aunque el procedimiento diga que las credenciales son correctas, sin

@@ -102,14 +102,30 @@ export function isValidOrderState(value: unknown): value is OrderState {
 }
 
 /**
- * Rutas de imagen del catálogo: solo admitimos rutas relativas del propio
- * sitio. Así un administrador (o alguien que le robe la sesión) no puede
- * apuntar las imágenes a un dominio externo ni colar un `javascript:`.
+ * Rutas de imagen del catálogo: admitimos rutas relativas del propio sitio y
+ * URLs HTTPS. No aceptamos otros esquemas, credenciales ni caracteres de
+ * control, de modo que no se pueda colar un `javascript:` ni romper atributos
+ * `style`.
  */
 export function isSafeImagePath(value: unknown): value is string {
   if (typeof value !== "string" || value.length === 0 || value.length > 300) {
     return false;
   }
 
-  return /^\/[A-Za-z0-9/_\-.]*$/.test(value) && !value.includes("..");
+  if (/^\/[A-Za-z0-9/_\-.%() ]*$/.test(value) && !value.includes("..")) {
+    return true;
+  }
+
+  try {
+    const url = new URL(value);
+
+    return (
+      url.protocol === "https:" &&
+      !url.username &&
+      !url.password &&
+      !/['"\\\n\r<>]/.test(value)
+    );
+  } catch {
+    return false;
+  }
 }

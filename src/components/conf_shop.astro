@@ -10,6 +10,7 @@ const products = await ProductRepository.getProducts();
 // consiguiera guardar en el catálogo una ruta con comillas, podría inyectar
 // CSS. Solo dejamos pasar rutas relativas de nuestro propio sitio.
 const safeImage = (value: string) => (isSafeImagePath(value) ? value : '');
+const safeImages = (values?: string[]) => (values ?? []).map(safeImage).filter(Boolean);
 ---
 <section class="shop-section" id="shop">
 	<div class="shop-header">
@@ -62,7 +63,9 @@ const safeImage = (value: string) => (isSafeImagePath(value) ? value : '');
 						class="product-image"
 						role="img"
 						aria-label={product.name}
-						data-product-images={product.images?.join('|') ?? (product.image ?? '')}
+						data-product-images={(safeImages(product.images).length > 0
+							? safeImages(product.images)
+							: [safeImage(product.image)].filter(Boolean)).join('|')}
 					>
 						<div
 							class="product-image-layer is-active"
